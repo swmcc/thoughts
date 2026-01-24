@@ -101,7 +101,7 @@ if Rails.env.development?
     { content: "A language that doesn't affect how you think isn't worth learning.", tags: %w[programming wisdom], ago: 90.days },
 
     # Older
-    { content: "Hello, World! My first thought.", tags: %w[meta beginning], ago: 120.days },
+    { content: "Hello, World! My first thought.", tags: %w[meta beginning], ago: 120.days }
   ]
 
   # Generate more random thoughts to reach 100
@@ -141,7 +141,7 @@ if Rails.env.development?
     { content: "Another day, another PR.", tags: %w[dev routine] },
     { content: "Found a gem of a library today.", tags: %w[dev discovery] },
     { content: "The power of a good abstraction.", tags: %w[architecture design] },
-    { content: "Fixing one bug, finding three more.", tags: %w[debugging reality] },
+    { content: "Fixing one bug, finding three more.", tags: %w[debugging reality] }
   ]
 
   # Add more thoughts with varied dates to reach 100
