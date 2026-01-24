@@ -7,7 +7,7 @@ class Thought < ApplicationRecord
 
   before_validation :generate_public_id, on: :create
   before_save :normalize_tags
-  before_save :fetch_link_preview, if: :content_changed?
+  before_save :fetch_link_preview, if: -> { content_changed? && respond_to?(:link_url=) }
 
   # Use public_id in URLs instead of id
   def to_param
