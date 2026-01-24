@@ -4,6 +4,10 @@ RAILS_ENV ?= development
 GREEN := $(shell tput -Txterm setaf 2)
 RESET := $(shell tput -Txterm sgr0)
 
+# Use bash with RVM loaded
+SHELL := /bin/bash
+RVM := source ~/.rvm/scripts/rvm && rvm use 3.4.4 &&
+
 .DEFAULT_GOAL := help
 
 # -----------------------------
@@ -12,81 +16,81 @@ RESET := $(shell tput -Txterm sgr0)
 
 local.run: ## Run the Rails app (with bin/dev)
 	@echo "$(GREEN)==> Running $(APP_NAME) in $(RAILS_ENV)...$(RESET)"
-	bin/dev
+	$(RVM) bin/dev
 
 local.setup: ## Install gems, setup db and tailwind, seed
 	@echo "$(GREEN)==> Setting up $(APP_NAME)...$(RESET)"
-	bundle install
-	bin/rails db:create
-	bin/rails db:migrate
-	bin/rails db:seed
-	bin/dev
+	$(RVM) bundle install
+	$(RVM) bin/rails db:create
+	$(RVM) bin/rails db:migrate
+	$(RVM) bin/rails db:seed
+	@echo "$(GREEN)==> Setup complete! Run 'make local.run' to start the server.$(RESET)"
 
 local.install: ## Just install dependencies
-	bundle install
+	$(RVM) bundle install
 
 local.db.create: ## Create the database
-	bin/rails db:create
+	$(RVM) bin/rails db:create
 
 local.db.drop: ## Drop the database
-	bin/rails db:drop
+	$(RVM) bin/rails db:drop
 
 local.db.migrate: ## Run database migrations
-	bin/rails db:migrate
+	$(RVM) bin/rails db:migrate
 
 local.db.seed: ## Seed the database
-	bin/rails db:seed
+	$(RVM) bin/rails db:seed
 
 local.db.reset: ## Reset the database (drop, create, migrate, seed)
-	bin/rails db:reset
+	$(RVM) bin/rails db:reset
 
 console: ## Start Rails console
-	bin/rails console
+	$(RVM) bin/rails console
 
 # -----------------------------
 # 🧪 Testing
 # -----------------------------
 
 local.test: ## Run all RSpec tests
-	bin/rspec
+	$(RVM) bin/rspec
 
 local.test.models: ## Run model specs
-	bin/rspec spec/models
+	$(RVM) bin/rspec spec/models
 
 local.test.requests: ## Run request specs
-	bin/rspec spec/requests
+	$(RVM) bin/rspec spec/requests
 
 local.test.system: ## Run system specs (browser tests)
-	bin/rspec spec/system
+	$(RVM) bin/rspec spec/system
 
 local.test.fast: ## Run tests excluding system specs
-	bin/rspec --exclude-pattern "spec/system/**/*_spec.rb"
+	$(RVM) bin/rspec --exclude-pattern "spec/system/**/*_spec.rb"
 
 # -----------------------------
 # 🔍 Linting & Security
 # -----------------------------
 
 lint: ## Run RuboCop linting
-	bundle exec rubocop
+	$(RVM) bundle exec rubocop
 
 lint.fix: ## Auto-fix RuboCop issues
-	bundle exec rubocop -A
+	$(RVM) bundle exec rubocop -A
 
 local.brakeman: ## Run Brakeman static security analysis
-	bin/brakeman --exit-on-warn --no-pager
+	$(RVM) bin/brakeman --exit-on-warn --no-pager
 
 local.rubocop: ## Run RuboCop with auto-fix
-	rubocop -A
+	$(RVM) rubocop -A
 
 # -----------------------------
 # 🎨 Assets
 # -----------------------------
 
 local.assets.build: ## Build Tailwind CSS
-	bin/rails tailwindcss:build
+	$(RVM) bin/rails tailwindcss:build
 
 local.assets.watch: ## Watch and rebuild Tailwind CSS
-	bin/rails tailwindcss:watch
+	$(RVM) bin/rails tailwindcss:watch
 
 # -----------------------------
 # 🧰 Meta
