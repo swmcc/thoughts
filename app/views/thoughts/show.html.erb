@@ -1,5 +1,21 @@
 <% content_for :title, truncate(@thought.content, length: 60) %>
 
+<% content_for :head do %>
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="<%= truncate(@thought.content, length: 60) %>">
+  <meta property="og:description" content="<%= @thought.content %>">
+  <meta property="og:image" content="https://swm.cc/profile.svg">
+  <meta property="og:url" content="<%= request.original_url %>">
+  <meta property="og:site_name" content="SWM's Thoughts">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="<%= truncate(@thought.content, length: 60) %>">
+  <meta name="twitter:description" content="<%= @thought.content %>">
+  <meta name="twitter:image" content="https://swm.cc/profile.svg">
+<% end %>
+
 <div class="max-w-2xl mx-auto">
   <%= link_to root_path, class: "inline-flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 mb-8 group transition-colors" do %>
     <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
