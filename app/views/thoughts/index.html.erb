@@ -1,6 +1,6 @@
 <div class="lg:grid lg:grid-cols-4 lg:gap-8">
   <!-- Main Timeline -->
-  <div class="lg:col-span-3">
+  <div class="lg:col-span-3" data-controller="infinite-scroll">
     <% if @current_tag %>
       <div class="mb-6 flex items-center justify-between">
         <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
@@ -11,18 +11,28 @@
     <% end %>
 
     <% if @thoughts.any? %>
-      <div class="divide-y divide-gray-200 dark:divide-gray-800">
-        <% @thoughts.each do |thought| %>
-          <%= render "shared/thought_card", thought: thought %>
+      <div id="thoughts-list" class="divide-y divide-gray-200 dark:divide-gray-800" data-infinite-scroll-target="entries">
+        <%= render partial: "shared/thought_card", collection: @thoughts, as: :thought %>
+      </div>
+
+      <div id="pagination" data-infinite-scroll-target="pagination" class="mt-8 flex justify-center">
+        <% if @thoughts.next_page %>
+          <%= link_to url_for(page: @thoughts.next_page, tag: @current_tag, format: :turbo_stream),
+              class: "px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium" do %>
+            Load more
+          <% end %>
         <% end %>
       </div>
 
-      <% if @thoughts.respond_to?(:next_page) && @thoughts.next_page %>
-        <div class="mt-8 flex justify-center">
-          <%= link_to "Load more", url_for(page: @thoughts.next_page, tag: @current_tag),
-              class: "px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium" %>
+      <div data-infinite-scroll-target="loading" class="hidden mt-8 flex justify-center">
+        <div class="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
+          <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>Loading more thoughts...</span>
         </div>
-      <% end %>
+      </div>
     <% else %>
       <div class="text-center py-12">
         <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

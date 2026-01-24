@@ -1,6 +1,6 @@
 class ThoughtsController < ApplicationController
   def index
-    @thoughts = Thought.recent.page(params[:page]).per(20)
+    @thoughts = Thought.recent.page(params[:page]).per(25)
 
     if params[:tag].present?
       @thoughts = @thoughts.with_tag(params[:tag])
@@ -8,6 +8,11 @@ class ThoughtsController < ApplicationController
     end
 
     @popular_tags = Thought.pluck(:tags).flatten.tally.sort_by { |_, count| -count }.first(10).map(&:first)
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def show
