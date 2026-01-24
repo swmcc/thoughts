@@ -1,1 +1,28 @@
 @import "tailwindcss";
+
+/* Enable dark mode with class strategy */
+@variant dark (&:where(.dark, .dark *));
+
+/* Custom styles */
+@layer base {
+  /* Smooth transitions for theme changes */
+  html {
+    @apply transition-colors duration-200;
+  }
+
+  /* Better focus styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900;
+  }
+}
+
+@layer components {
+  /* Card hover effect */
+  .thought-card {
+    @apply transition-all duration-200 ease-out;
+  }
+
+  .thought-card:hover {
+    @apply transform -translate-y-0.5;
+  }
+}
