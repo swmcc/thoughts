@@ -14,12 +14,9 @@
     </p>
 
     <div class="flex flex-wrap items-center gap-4 text-sm border-t border-gray-200 dark:border-gray-700 pt-6">
-      <div class="text-gray-500 dark:text-gray-400">
-        <span class="font-medium"><%= smart_time(@thought.created_at) %></span>
-        <time datetime="<%= @thought.created_at.iso8601 %>" class="block text-xs mt-0.5">
-          <%= full_timestamp(@thought.created_at) %>
-        </time>
-      </div>
+      <time datetime="<%= @thought.created_at.iso8601 %>" class="text-gray-500 dark:text-gray-400">
+        <%= full_timestamp(@thought.created_at) %>
+      </time>
 
       <% if @thought.tags.any? %>
         <span class="text-gray-300 dark:text-gray-600">|</span>
