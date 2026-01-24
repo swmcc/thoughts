@@ -6,7 +6,7 @@
 
     <div class="flex flex-wrap items-center gap-3 text-sm">
       <time datetime="<%= thought.created_at.iso8601 %>" class="text-gray-500 dark:text-gray-400">
-        <%= time_ago_in_words(thought.created_at) %> ago
+        <%= smart_time(thought.created_at) %>
       </time>
 
       <% if thought.tags.any? %>
