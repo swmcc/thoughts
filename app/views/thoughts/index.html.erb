@@ -1,0 +1,55 @@
+<div class="lg:grid lg:grid-cols-4 lg:gap-8">
+  <!-- Main Timeline -->
+  <div class="lg:col-span-3">
+    <% if @current_tag %>
+      <div class="mb-6 flex items-center justify-between">
+        <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
+          Thoughts tagged #<%= @current_tag %>
+        </h1>
+        <%= link_to "Clear filter", root_path, class: "text-sm text-blue-600 dark:text-blue-400 hover:underline" %>
+      </div>
+    <% end %>
+
+    <% if @thoughts.any? %>
+      <div class="divide-y divide-gray-200 dark:divide-gray-800">
+        <% @thoughts.each do |thought| %>
+          <%= render "shared/thought_card", thought: thought %>
+        <% end %>
+      </div>
+
+      <% if @thoughts.respond_to?(:next_page) && @thoughts.next_page %>
+        <div class="mt-8 flex justify-center">
+          <%= link_to "Load more", url_for(page: @thoughts.next_page, tag: @current_tag),
+              class: "px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium" %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">No thoughts yet</h3>
+        <p class="mt-2 text-gray-500 dark:text-gray-400">Check back later for new thoughts.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="hidden lg:block">
+    <div class="sticky top-24">
+      <% if @popular_tags.any? %>
+        <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6">
+          <h2 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
+            Popular Tags
+          </h2>
+          <div class="flex flex-wrap gap-2">
+            <% @popular_tags.each do |tag| %>
+              <%= link_to "##{tag}", root_path(tag: tag),
+                  class: "inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium #{@current_tag == tag ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-300'} transition-colors shadow-sm" %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </aside>
+</div>
