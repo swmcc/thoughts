@@ -3,6 +3,10 @@ Rails.application.routes.draw do
   root "thoughts#index"
   resources :thoughts, only: [ :index, :show ]
 
+  # Static pages
+  get "about", to: "pages#about"
+  get "colophon", to: "pages#colophon"
+
   # JSON API (read = public, write = token auth)
   namespace :api do
     resources :thoughts, only: [ :index, :show, :create, :update, :destroy ]

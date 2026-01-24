@@ -41,6 +41,17 @@ RSpec.describe "Thoughts", type: :request do
       expect(response.body).to include("#rails")
       expect(response.body).to include("#ruby")
     end
+
+    it "searches thoughts by content" do
+      matching = create(:thought, content: "Learning Ruby is fun")
+      non_matching = create(:thought, content: "JavaScript rocks")
+
+      get root_path, params: { q: "ruby" }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(matching.content)
+      expect(response.body).not_to include(non_matching.content)
+    end
   end
 
   describe "GET /thoughts/:id" do

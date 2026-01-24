@@ -1,0 +1,72 @@
+<% content_for :title, "About" %>
+
+<div class="max-w-2xl mx-auto">
+  <%= link_to root_path, class: "inline-flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 mb-8 group transition-colors" do %>
+    <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+    </svg>
+    Back to timeline
+  <% end %>
+
+  <article class="relative">
+    <div class="absolute -inset-4 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-blue-500/10 rounded-3xl blur-2xl opacity-50"></div>
+
+    <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-xl shadow-zinc-200/50 dark:shadow-none p-8">
+      <!-- Header with avatar -->
+      <div class="flex gap-4 mb-6">
+        <div class="shrink-0">
+          <%= image_tag "https://swm.cc/profile.svg",
+              class: "w-16 h-16 rounded-full bg-white dark:bg-zinc-900",
+              alt: "swmcc" %>
+        </div>
+        <div class="flex flex-col justify-center">
+          <h1 class="text-2xl font-bold text-zinc-900 dark:text-white">About</h1>
+          <p class="text-sm text-zinc-500 dark:text-zinc-400">Why this exists</p>
+        </div>
+      </div>
+
+      <div class="space-y-6 text-zinc-700 dark:text-zinc-300 leading-relaxed">
+        <p>
+          When building my website at
+          <a href="https://swm.cc" class="text-blue-500 dark:text-blue-400 hover:underline">swm.cc</a>,
+          I wanted a place for quick thoughts. The obvious approach was storing them as markdown files in a git repository. While this works, the process of adding new thoughts felt tedious - firing up an editor, creating a new file, committing, pushing. Too much friction for capturing fleeting ideas.
+        </p>
+
+        <h2 class="text-lg font-semibold text-zinc-900 dark:text-white pt-2">A Better Approach</h2>
+        <p>
+          So I built this. A dedicated home for my thoughts with a proper admin interface and a
+          <a href="/api/thoughts" class="text-blue-500 dark:text-blue-400 hover:underline">JSON API</a>
+          that my main site can consume. Now when I have a thought, I can quickly jot it down from anywhere - even from my phone. The swm.cc site simply fetches from the API and renders the latest thoughts.
+        </p>
+
+        <h2 class="text-lg font-semibold text-zinc-900 dark:text-white pt-2">Why This Matters</h2>
+        <ul class="space-y-3 ml-4">
+          <li class="flex items-start gap-2">
+            <span class="text-blue-500 mt-1">-</span>
+            <span><strong>Own your data.</strong> These thoughts live on my infrastructure, not locked away in someone else's platform. No algorithm deciding what gets seen. No ads. No tracking.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-blue-500 mt-1">-</span>
+            <span><strong>Reduce friction.</strong> The easier it is to capture a thought, the more likely I am to do it. A simple web form beats git commits every time.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-blue-500 mt-1">-</span>
+            <span><strong>Separation of concerns.</strong> Content lives here, presentation happens on swm.cc. I can redesign either without touching the other.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-blue-500 mt-1">-</span>
+            <span><strong>Portability.</strong> With a clean JSON API, I can consume this content anywhere - my website, a mobile app, or something I haven't built yet.</span>
+          </li>
+        </ul>
+
+        <h2 class="text-lg font-semibold text-zinc-900 dark:text-white pt-2">Get in Touch</h2>
+        <p>
+          Want to chat? Drop me an
+          <a href="#" onclick="window.location.href='mail'+'to:'+'me'+'@'+'swm.cc'; return false;" class="text-blue-500 dark:text-blue-400 hover:underline">email</a>
+          or find me on
+          <a href="https://swm.cc" class="text-blue-500 dark:text-blue-400 hover:underline">swm.cc</a>.
+        </p>
+      </div>
+    </div>
+  </article>
+</div>

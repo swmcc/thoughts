@@ -1,45 +1,140 @@
-<div class="lg:grid lg:grid-cols-4 lg:gap-8">
+<!-- Profile Header -->
+<div class="mb-8 -mx-6 -mt-12">
+  <!-- Banner - replace /banner.jpg in public folder -->
+  <div class="h-32 sm:h-48 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 relative">
+    <img src="/banner.jpg" class="w-full h-full object-cover absolute inset-0" alt="Banner" onerror="this.style.display='none'">
+  </div>
+
+  <!-- Avatar & Info -->
+  <div class="max-w-3xl mx-auto px-6">
+    <div class="relative -mt-12 sm:-mt-16 flex items-end gap-4">
+      <div class="relative">
+        <%= image_tag "https://swm.cc/profile.svg",
+            class: "w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-zinc-50 dark:border-zinc-950 bg-white dark:bg-zinc-900 shadow-xl",
+            alt: "Profile" %>
+      </div>
+      <div class="pb-2 sm:pb-4 flex-1 flex items-start justify-between">
+        <div>
+          <h1 class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white">SWM's thoughts</h1>
+          <p class="text-sm text-zinc-500 dark:text-zinc-400">Random musings & ideas</p>
+        </div>
+
+        <div class="flex items-center gap-1">
+          <!-- More menu -->
+          <div class="relative" data-controller="dropdown">
+            <button data-action="click->dropdown#toggle" class="p-2.5 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:shadow transition-all" title="More">
+              <svg class="w-5 h-5 text-zinc-700 dark:text-zinc-200" fill="currentColor" viewBox="0 0 24 24">
+                <circle cx="5" cy="12" r="2"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+                <circle cx="19" cy="12" r="2"></circle>
+              </svg>
+            </button>
+
+            <!-- Dropdown menu -->
+            <div data-dropdown-target="menu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xl z-50 overflow-hidden">
+              <%= link_to about_path, class: "flex items-center gap-3 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors" do %>
+                <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">About</span>
+              <% end %>
+              <%= link_to colophon_path, class: "flex items-center gap-3 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors" do %>
+                <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                </svg>
+                <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Colophon</span>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Mail button -->
+          <a href="#" onclick="window.location.href='mail'+'to:'+'me'+'@'+'swm.cc'; return false;" class="p-2.5 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:shadow transition-all" title="Email me">
+            <svg class="w-5 h-5 text-zinc-700 dark:text-zinc-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="lg:grid lg:grid-cols-4 lg:gap-12">
   <!-- Main Timeline -->
   <div class="lg:col-span-3" data-controller="infinite-scroll">
+    <% if @search_query.present? %>
+      <div class="mb-8 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
+          <h1 class="text-xl font-semibold text-zinc-900 dark:text-white">
+            Results for "<span class="text-blue-600 dark:text-blue-400"><%= @search_query %></span>"
+          </h1>
+        </div>
+        <span class="text-sm text-zinc-500"><%= @thoughts.total_count %> found</span>
+      </div>
+    <% end %>
+
     <% if @current_tag %>
-      <div class="mb-6 flex items-center justify-between">
-        <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
-          Thoughts tagged #<%= @current_tag %>
-        </h1>
-        <%= link_to "Clear filter", root_path, class: "text-sm text-blue-600 dark:text-blue-400 hover:underline" %>
+      <div class="mb-8 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
+          <h1 class="text-xl font-semibold text-zinc-900 dark:text-white">
+            Thoughts tagged <span class="text-blue-600 dark:text-blue-400">#<%= @current_tag %></span>
+          </h1>
+        </div>
+        <%= link_to root_path, class: "inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+          Clear filter
+        <% end %>
       </div>
     <% end %>
 
     <% if @thoughts.any? %>
-      <div id="thoughts-list" class="divide-y divide-gray-200 dark:divide-gray-800" data-infinite-scroll-target="entries">
+      <div id="thoughts-list" class="space-y-1" data-infinite-scroll-target="entries">
         <%= render partial: "shared/thought_card", collection: @thoughts, as: :thought %>
       </div>
 
-      <div id="pagination" data-infinite-scroll-target="pagination" class="mt-8 flex justify-center">
+      <div id="pagination" data-infinite-scroll-target="pagination" class="mt-12 flex justify-center">
         <% if @thoughts.next_page %>
-          <%= link_to url_for(page: @thoughts.next_page, tag: @current_tag, format: :turbo_stream),
-              class: "px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium" do %>
-            Load more
+          <%= link_to url_for(page: @thoughts.next_page, tag: @current_tag, q: @search_query, format: :turbo_stream),
+              class: "inline-flex items-center gap-2 px-6 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all duration-200 text-sm font-medium shadow-sm hover:shadow" do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+            Load more thoughts
           <% end %>
         <% end %>
       </div>
 
-      <div data-infinite-scroll-target="loading" class="hidden mt-8 flex justify-center">
-        <div class="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
+      <div data-infinite-scroll-target="loading" class="hidden mt-12 flex justify-center">
+        <div class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400">
           <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          <span>Loading more thoughts...</span>
+          <span class="text-sm">Loading more thoughts...</span>
         </div>
       </div>
     <% else %>
-      <div class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-        </svg>
-        <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">No thoughts yet</h3>
-        <p class="mt-2 text-gray-500 dark:text-gray-400">Check back later for new thoughts.</p>
+      <div class="text-center py-16">
+        <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-700 flex items-center justify-center">
+          <svg class="w-8 h-8 text-zinc-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <% if @search_query.present? %>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            <% else %>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            <% end %>
+          </svg>
+        </div>
+        <% if @search_query.present? %>
+          <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">No results found</h3>
+          <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Try a different search term.</p>
+        <% else %>
+          <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">No thoughts yet</h3>
+          <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Check back later for new thoughts.</p>
+        <% end %>
       </div>
     <% end %>
   </div>
@@ -48,14 +143,14 @@
   <aside class="hidden lg:block">
     <div class="sticky top-24">
       <% if @popular_tags.any? %>
-        <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6">
-          <h2 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
+        <div class="rounded-2xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-800/50 p-6">
+          <h2 class="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-4">
             Popular Tags
           </h2>
           <div class="flex flex-wrap gap-2">
             <% @popular_tags.each do |tag| %>
               <%= link_to "##{tag}", root_path(tag: tag),
-                  class: "inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium #{@current_tag == tag ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-300'} transition-colors shadow-sm" %>
+                  class: "inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 #{@current_tag == tag ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-200'}" %>
             <% end %>
           </div>
         </div>

@@ -3,11 +3,14 @@
 <% end %>
 
 <%= turbo_stream.replace "pagination" do %>
-  <div id="pagination" data-infinite-scroll-target="pagination" class="mt-8 flex justify-center">
+  <div id="pagination" data-infinite-scroll-target="pagination" class="mt-12 flex justify-center">
     <% if @thoughts.next_page %>
-      <%= link_to url_for(page: @thoughts.next_page, tag: @current_tag, format: :turbo_stream),
-          class: "px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium" do %>
-        Load more
+      <%= link_to url_for(page: @thoughts.next_page, tag: @current_tag, q: @search_query, format: :turbo_stream),
+          class: "inline-flex items-center gap-2 px-6 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all duration-200 text-sm font-medium shadow-sm hover:shadow" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+        Load more thoughts
       <% end %>
     <% end %>
   </div>

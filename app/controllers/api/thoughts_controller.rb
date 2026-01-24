@@ -60,7 +60,7 @@ module Api
     private
 
     def set_thought
-      @thought = Thought.find(params[:id])
+      @thought = Thought.find_by!(public_id: params[:id])
     end
 
     def thought_params
@@ -69,7 +69,7 @@ module Api
 
     def thought_json(thought)
       {
-        id: thought.id,
+        id: thought.public_id,
         content: thought.content,
         tags: thought.tags,
         created_at: thought.created_at.iso8601

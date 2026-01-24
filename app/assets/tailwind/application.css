@@ -3,26 +3,72 @@
 /* Enable dark mode with class strategy */
 @variant dark (&:where(.dark, .dark *));
 
-/* Custom styles */
+/* Modern font stack */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
 @layer base {
-  /* Smooth transitions for theme changes */
   html {
-    @apply transition-colors duration-200;
+    @apply antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
-  /* Better focus styles */
-  :focus-visible {
-    @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900;
+  body {
+    @apply bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100;
+  }
+
+  ::selection {
+    @apply bg-blue-500/20;
   }
 }
 
 @layer components {
-  /* Card hover effect */
-  .thought-card {
-    @apply transition-all duration-200 ease-out;
+  /* Subtle glass effect for cards */
+  .glass {
+    @apply bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl;
   }
 
-  .thought-card:hover {
-    @apply transform -translate-y-0.5;
+  /* Glow effect for interactive elements */
+  .glow {
+    @apply relative;
+  }
+
+  .glow::before {
+    content: "";
+    @apply absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl opacity-0 blur transition-opacity duration-300;
+  }
+
+  .glow:hover::before {
+    @apply opacity-20;
   }
 }
+
+/* Smooth page transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Staggered animation for list items */
+.thought-card {
+  animation: fadeIn 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+.thought-card:nth-child(1) { animation-delay: 0ms; }
+.thought-card:nth-child(2) { animation-delay: 50ms; }
+.thought-card:nth-child(3) { animation-delay: 100ms; }
+.thought-card:nth-child(4) { animation-delay: 150ms; }
+.thought-card:nth-child(5) { animation-delay: 200ms; }
+.thought-card:nth-child(n+6) { animation-delay: 250ms; }

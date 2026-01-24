@@ -1,0 +1,122 @@
+<% content_for :title, "Colophon" %>
+
+<div class="max-w-2xl mx-auto">
+  <%= link_to root_path, class: "inline-flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 mb-8 group transition-colors" do %>
+    <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+    </svg>
+    Back to timeline
+  <% end %>
+
+  <article class="relative">
+    <div class="absolute -inset-4 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-blue-500/10 rounded-3xl blur-2xl opacity-50"></div>
+
+    <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-xl shadow-zinc-200/50 dark:shadow-none p-8">
+      <h1 class="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Colophon</h1>
+      <p class="text-zinc-500 dark:text-zinc-400 mb-8">The technical details behind this site.</p>
+
+      <div class="space-y-8">
+        <!-- Technology Stack -->
+        <section>
+          <h2 class="text-lg font-semibold text-zinc-900 dark:text-white mb-3 flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+            </svg>
+            Technology Stack
+          </h2>
+          <ul class="space-y-2 text-zinc-700 dark:text-zinc-300">
+            <li class="flex items-start gap-2">
+              <span class="text-blue-500 mt-1">-</span>
+              <span><strong>Framework:</strong> Rails 8.1 with Hotwire (Turbo + Stimulus)</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-500 mt-1">-</span>
+              <span><strong>Styling:</strong> Tailwind CSS v4.1 with custom design system</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-500 mt-1">-</span>
+              <span><strong>Database:</strong> PostgreSQL with array columns and GIN indexing</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-500 mt-1">-</span>
+              <span><strong>JavaScript:</strong> Stimulus controllers for interactivity</span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Typography -->
+        <section>
+          <h2 class="text-lg font-semibold text-zinc-900 dark:text-white mb-3 flex items-center gap-2">
+            <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
+            </svg>
+            Typography
+          </h2>
+          <p class="text-zinc-700 dark:text-zinc-300 leading-relaxed">
+            This site uses <a href="https://rsms.me/inter/" class="text-blue-500 dark:text-blue-400 hover:underline">Inter</a>,
+            a variable font family designed for computer screens with a tall x-height for improved readability.
+          </p>
+        </section>
+
+        <!-- Features -->
+        <section>
+          <h2 class="text-lg font-semibold text-zinc-900 dark:text-white mb-3 flex items-center gap-2">
+            <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Features
+          </h2>
+          <ul class="space-y-2 text-zinc-700 dark:text-zinc-300">
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-1">-</span>
+              <span>Dark mode with system preference detection</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-1">-</span>
+              <span>Infinite scroll with Turbo Streams</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-1">-</span>
+              <span>Full-text search across all thoughts</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-1">-</span>
+              <span>Tag-based filtering and organization</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-1">-</span>
+              <span>JSON API for mobile app integration</span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Privacy -->
+        <section>
+          <h2 class="text-lg font-semibold text-zinc-900 dark:text-white mb-3 flex items-center gap-2">
+            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+            Privacy
+          </h2>
+          <p class="text-zinc-700 dark:text-zinc-300 leading-relaxed">
+            Zero tracking, no cookies, no analytics. Just thoughts.
+          </p>
+        </section>
+
+        <!-- Source Code -->
+        <section>
+          <h2 class="text-lg font-semibold text-zinc-900 dark:text-white mb-3 flex items-center gap-2">
+            <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+            </svg>
+            Source Code
+          </h2>
+          <p class="text-zinc-700 dark:text-zinc-300 leading-relaxed">
+            This project is open source and available on
+            <a href="https://github.com/swmcc/thoughts" class="text-blue-500 dark:text-blue-400 hover:underline">GitHub</a>.
+          </p>
+        </section>
+      </div>
+    </div>
+  </article>
+</div>

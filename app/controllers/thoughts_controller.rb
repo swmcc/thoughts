@@ -7,6 +7,11 @@ class ThoughtsController < ApplicationController
       @current_tag = params[:tag]
     end
 
+    if params[:q].present?
+      @thoughts = @thoughts.search(params[:q])
+      @search_query = params[:q]
+    end
+
     @popular_tags = Thought.pluck(:tags).flatten.tally.sort_by { |_, count| -count }.first(10).map(&:first)
 
     respond_to do |format|
@@ -16,7 +21,7 @@ class ThoughtsController < ApplicationController
   end
 
   def show
-    @thought = Thought.find(params[:id])
+    @thought = Thought.find_by!(public_id: params[:id])
     @thought.increment_view_count!
   end
 end

@@ -41,7 +41,7 @@ module Admin
     private
 
     def set_thought
-      @thought = Thought.find(params[:id])
+      @thought = Thought.find_by!(public_id: params[:id])
     end
 
     def thought_params

@@ -22,7 +22,7 @@ RSpec.describe "Api::Thoughts", type: :request do
         get api_thoughts_path
 
         json = JSON.parse(response.body)
-        expect(json["thoughts"].first["id"]).to eq(new_thought.id)
+        expect(json["thoughts"].first["id"]).to eq(new_thought.public_id)
       end
 
       it "filters by tag" do
@@ -33,7 +33,7 @@ RSpec.describe "Api::Thoughts", type: :request do
 
         json = JSON.parse(response.body)
         expect(json["thoughts"].length).to eq(1)
-        expect(json["thoughts"].first["id"]).to eq(rails_thought.id)
+        expect(json["thoughts"].first["id"]).to eq(rails_thought.public_id)
       end
 
       it "includes pagination metadata" do
@@ -61,7 +61,7 @@ RSpec.describe "Api::Thoughts", type: :request do
         thought_json = json["thoughts"].first
 
         expect(thought_json).to include(
-          "id" => thought.id,
+          "id" => thought.public_id,
           "content" => thought.content,
           "tags" => thought.tags
         )
@@ -88,7 +88,7 @@ RSpec.describe "Api::Thoughts", type: :request do
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
-        expect(json["thought"]["id"]).to eq(thought.id)
+        expect(json["thought"]["id"]).to eq(thought.public_id)
         expect(json["thought"]["content"]).to eq(thought.content)
         expect(json["thought"]["tags"]).to eq(thought.tags)
       end
@@ -109,7 +109,7 @@ RSpec.describe "Api::Thoughts", type: :request do
     end
 
     it "returns 404 for non-existent thought" do
-      get api_thought_path(id: 99999)
+      get api_thought_path(id: "nonexistent123")
       expect(response).to have_http_status(:not_found)
     end
   end
