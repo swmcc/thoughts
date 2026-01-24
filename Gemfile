@@ -23,6 +23,9 @@ gem "bcrypt", "~> 3.1.7"
 # Pagination
 gem "kaminari"
 
+# Link preview / Open Graph fetching
+gem "open_graph_reader"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

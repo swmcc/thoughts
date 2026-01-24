@@ -68,12 +68,23 @@ module Api
     end
 
     def thought_json(thought)
-      {
+      json = {
         id: thought.public_id,
         content: thought.content,
         tags: thought.tags,
         created_at: thought.created_at.iso8601
       }
+
+      if thought.link_url.present?
+        json[:link_preview] = {
+          url: thought.link_url,
+          title: thought.link_title,
+          description: thought.link_description,
+          image: thought.link_image
+        }
+      end
+
+      json
     end
   end
 end

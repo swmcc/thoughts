@@ -48,6 +48,25 @@
         <%= @thought.content %>
       </p>
 
+      <% if @thought.link_url.present? %>
+        <a href="<%= @thought.link_url %>" target="_blank" rel="noopener" class="block mt-4 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+          <% if @thought.link_image.present? %>
+            <div class="aspect-[2/1] bg-zinc-100 dark:bg-zinc-800">
+              <%= image_tag @thought.link_image, class: "w-full h-full object-cover", alt: @thought.link_title %>
+            </div>
+          <% end %>
+          <div class="p-4">
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 truncate"><%= URI.parse(@thought.link_url).host rescue @thought.link_url %></p>
+            <% if @thought.link_title.present? %>
+              <p class="font-medium text-zinc-900 dark:text-white"><%= @thought.link_title %></p>
+            <% end %>
+            <% if @thought.link_description.present? %>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1"><%= @thought.link_description %></p>
+            <% end %>
+          </div>
+        </a>
+      <% end %>
+
       <% if @thought.tags.any? %>
         <div class="mt-4 text-sm">
           <% @thought.tags.each_with_index do |tag, i| %>
