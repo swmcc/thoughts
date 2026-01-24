@@ -46,7 +46,8 @@ class Thought < ApplicationRecord
         self.link_url = url
         self.link_title = nil
         self.link_description = nil
-        self.link_image = final_url
+        # Store the original URL, not the presigned S3 URL (which expires)
+        self.link_image = url
       else
         # Try to fetch OG data
         og = OpenGraphReader.fetch(url)
