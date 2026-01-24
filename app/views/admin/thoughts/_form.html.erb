@@ -27,6 +27,16 @@
     </div>
   </div>
 
+  <div>
+    <%= f.label :created_at, "Posted at", class: "block text-sm font-medium text-gray-700" %>
+    <div class="mt-1">
+      <%= f.datetime_local_field :created_at,
+          value: thought.created_at&.strftime("%Y-%m-%dT%H:%M"),
+          class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border" %>
+    </div>
+    <p class="mt-1 text-sm text-gray-500">When this thought was posted</p>
+  </div>
+
   <div data-controller="tag-input">
     <%= f.label :tags, class: "block text-sm font-medium text-gray-700" %>
     <div class="mt-1">

@@ -45,7 +45,7 @@ module Admin
     end
 
     def thought_params
-      params.require(:thought).permit(:content, tags: [])
+      params.require(:thought).permit(:content, :created_at, tags: [])
     end
   end
 end
