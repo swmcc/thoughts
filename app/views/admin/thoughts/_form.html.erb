@@ -1,0 +1,64 @@
+<%= form_with model: [:admin, thought], class: "space-y-6" do |f| %>
+  <% if thought.errors.any? %>
+    <div class="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <h3 class="font-medium">Please fix the following errors:</h3>
+      <ul class="mt-2 list-disc list-inside text-sm">
+        <% thought.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div data-controller="character-counter">
+    <%= f.label :content, class: "block text-sm font-medium text-gray-700" %>
+    <div class="mt-1">
+      <%= f.text_area :content, rows: 4,
+          data: { character_counter_target: "input", action: "input->character-counter#count" },
+          class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-lg",
+          placeholder: "What's on your mind?" %>
+    </div>
+    <div class="mt-1 flex justify-end">
+      <span data-character-counter-target="count"
+            data-max="<%= Thought::MAX_CONTENT_LENGTH %>"
+            class="text-sm text-gray-500">
+        <%= Thought::MAX_CONTENT_LENGTH %>
+      </span>
+    </div>
+  </div>
+
+  <div data-controller="tag-input">
+    <%= f.label :tags, class: "block text-sm font-medium text-gray-700" %>
+    <div class="mt-1">
+      <div class="flex flex-wrap gap-2 mb-2" data-tag-input-target="tagList">
+        <% (thought.tags || []).each do |tag| %>
+          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+            <%= tag %>
+            <button type="button" data-action="tag-input#removeTag" data-tag="<%= tag %>" class="hover:text-blue-600">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+            <input type="hidden" name="thought[tags][]" value="<%= tag %>">
+          </span>
+        <% end %>
+      </div>
+      <div class="relative">
+        <input type="text"
+               data-tag-input-target="input"
+               data-action="keydown->tag-input#handleKeydown input->tag-input#showSuggestions"
+               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border"
+               placeholder="Type a tag and press Enter">
+        <div data-tag-input-target="suggestions" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-auto">
+        </div>
+      </div>
+    </div>
+    <p class="mt-1 text-sm text-gray-500">Press Enter to add a tag</p>
+  </div>
+
+  <div class="flex justify-end space-x-4">
+    <%= link_to "Cancel", admin_thoughts_path, class: "px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50" %>
+    <%= f.submit thought.persisted? ? "Update Thought" : "Create Thought",
+        class: "px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer" %>
+  </div>
+<% end %>
