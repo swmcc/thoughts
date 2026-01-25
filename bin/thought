@@ -1,0 +1,264 @@
+#!/usr/bin/env bash
+#
+# thought - CLI for posting thoughts
+#
+# Usage:
+#   thought "Your thought here"
+#   thought -t tag1,tag2 "Your thought here"
+#   echo "Your thought" | thought
+#   thought -t tag1 -t tag2 "Your thought"
+#
+# Configuration:
+#   Store config in ~/.config/thoughts/config
+#
+#   THOUGHTS_API_URL=https://your-domain.com/api/thoughts
+#   THOUGHTS_API_TOKEN=your-api-token
+#
+
+set -e
+
+CONFIG_DIR="${HOME}/.config/thoughts"
+CONFIG_FILE="${CONFIG_DIR}/config"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+usage() {
+    cat <<EOF
+Usage: thought [OPTIONS] [CONTENT]
+
+Post a thought from the command line.
+
+Options:
+  -t, --tag TAG    Add a tag (can be used multiple times)
+  -h, --help       Show this help message
+  -v, --version    Show version
+  --init           Initialize configuration
+  --config         Show current configuration
+
+Examples:
+  thought "Hello world"
+  thought -t coding -t ruby "Learning Ruby today"
+  thought --tag=work "Finished the feature"
+  echo "Piped thought" | thought
+  echo "With tags" | thought -t idea
+
+Configuration:
+  Run 'thought --init' to set up your configuration, or manually create:
+  ${CONFIG_FILE}
+
+  Required variables:
+    THOUGHTS_API_URL   - API endpoint (e.g., https://example.com/api/thoughts)
+    THOUGHTS_API_TOKEN - Your API token for authentication
+EOF
+}
+
+version() {
+    echo "thought 1.0.0"
+}
+
+init_config() {
+    mkdir -p "${CONFIG_DIR}"
+
+    if [[ -f "${CONFIG_FILE}" ]]; then
+        echo -e "${YELLOW}Config file already exists at ${CONFIG_FILE}${NC}"
+        read -p "Overwrite? [y/N] " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "Aborted."
+            exit 0
+        fi
+    fi
+
+    echo -e "${BLUE}Setting up thought CLI...${NC}"
+    echo
+
+    read -p "API URL (e.g., https://thoughts.example.com/api/thoughts): " api_url
+    read -p "API Token: " api_token
+
+    cat > "${CONFIG_FILE}" <<EOF
+# thought CLI configuration
+THOUGHTS_API_URL=${api_url}
+THOUGHTS_API_TOKEN=${api_token}
+EOF
+
+    chmod 600 "${CONFIG_FILE}"
+
+    echo
+    echo -e "${GREEN}Configuration saved to ${CONFIG_FILE}${NC}"
+}
+
+show_config() {
+    if [[ ! -f "${CONFIG_FILE}" ]]; then
+        echo -e "${RED}No configuration found.${NC}"
+        echo "Run 'thought --init' to set up."
+        exit 1
+    fi
+
+    echo "Configuration file: ${CONFIG_FILE}"
+    echo
+    # Show config but mask the token
+    while IFS='=' read -r key value; do
+        [[ -z "$key" || "$key" =~ ^# ]] && continue
+        if [[ "$key" == "THOUGHTS_API_TOKEN" ]]; then
+            echo "${key}=****${value: -4}"
+        else
+            echo "${key}=${value}"
+        fi
+    done < "${CONFIG_FILE}"
+}
+
+load_config() {
+    if [[ ! -f "${CONFIG_FILE}" ]]; then
+        echo -e "${RED}Error: No configuration found.${NC}" >&2
+        echo "Run 'thought --init' to set up your configuration." >&2
+        exit 1
+    fi
+
+    source "${CONFIG_FILE}"
+
+    if [[ -z "${THOUGHTS_API_URL}" ]]; then
+        echo -e "${RED}Error: THOUGHTS_API_URL not set in config.${NC}" >&2
+        exit 1
+    fi
+
+    if [[ -z "${THOUGHTS_API_TOKEN}" ]]; then
+        echo -e "${RED}Error: THOUGHTS_API_TOKEN not set in config.${NC}" >&2
+        exit 1
+    fi
+}
+
+post_thought() {
+    local content="$1"
+    shift
+    local tags=("$@")
+
+    # Validate content length
+    if [[ ${#content} -gt 140 ]]; then
+        echo -e "${RED}Error: Thought exceeds 140 characters (${#content} chars).${NC}" >&2
+        exit 1
+    fi
+
+    if [[ -z "${content}" ]]; then
+        echo -e "${RED}Error: Content cannot be empty.${NC}" >&2
+        exit 1
+    fi
+
+    # Build tags JSON array
+    local tags_json="[]"
+    if [[ ${#tags[@]} -gt 0 ]]; then
+        tags_json=$(printf '%s\n' "${tags[@]}" | jq -R . | jq -s .)
+    fi
+
+    # Build request body
+    local body
+    body=$(jq -n \
+        --arg content "$content" \
+        --argjson tags "$tags_json" \
+        '{thought: {content: $content, tags: $tags}}')
+
+    # Make API request
+    local response
+    local http_code
+
+    response=$(curl -s -w "\n%{http_code}" \
+        -X POST "${THOUGHTS_API_URL}" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${THOUGHTS_API_TOKEN}" \
+        -H "User-Agent: thought-cli/1.0" \
+        -d "${body}")
+
+    http_code=$(echo "$response" | tail -n1)
+    response=$(echo "$response" | sed '$d')
+
+    if [[ "$http_code" == "201" ]]; then
+        local id
+        id=$(echo "$response" | jq -r '.thought.id')
+        echo -e "${GREEN}Thought posted successfully.${NC}"
+        echo -e "ID: ${BLUE}${id}${NC}"
+
+        if [[ ${#tags[@]} -gt 0 ]]; then
+            echo -e "Tags: ${YELLOW}${tags[*]}${NC}"
+        fi
+    else
+        echo -e "${RED}Error posting thought (HTTP ${http_code}):${NC}" >&2
+        echo "$response" | jq -r '.errors // .error // .' >&2
+        exit 1
+    fi
+}
+
+# Parse arguments
+TAGS=()
+CONTENT=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -v|--version)
+            version
+            exit 0
+            ;;
+        --init)
+            init_config
+            exit 0
+            ;;
+        --config)
+            show_config
+            exit 0
+            ;;
+        -t|--tag)
+            if [[ -n "$2" && ! "$2" =~ ^- ]]; then
+                # Handle comma-separated tags
+                IFS=',' read -ra SPLIT_TAGS <<< "$2"
+                TAGS+=("${SPLIT_TAGS[@]}")
+                shift 2
+            else
+                echo -e "${RED}Error: --tag requires an argument.${NC}" >&2
+                exit 1
+            fi
+            ;;
+        --tag=*)
+            IFS=',' read -ra SPLIT_TAGS <<< "${1#*=}"
+            TAGS+=("${SPLIT_TAGS[@]}")
+            shift
+            ;;
+        -*)
+            echo -e "${RED}Unknown option: $1${NC}" >&2
+            usage
+            exit 1
+            ;;
+        *)
+            if [[ -z "$CONTENT" ]]; then
+                CONTENT="$1"
+            else
+                CONTENT="$CONTENT $1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Check for piped input if no content provided
+if [[ -z "$CONTENT" && ! -t 0 ]]; then
+    CONTENT=$(cat)
+fi
+
+# If still no content, show usage
+if [[ -z "$CONTENT" ]]; then
+    usage
+    exit 1
+fi
+
+# Trim whitespace
+CONTENT=$(echo "$CONTENT" | xargs)
+
+# Load config and post
+load_config
+post_thought "$CONTENT" "${TAGS[@]}"
