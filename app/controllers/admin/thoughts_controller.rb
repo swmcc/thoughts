@@ -1,5 +1,7 @@
 module Admin
   class ThoughtsController < BaseController
+    include SourceDetectable
+
     before_action :set_thought, only: [ :show, :edit, :update, :destroy ]
 
     def index
@@ -15,6 +17,7 @@ module Admin
 
     def create
       @thought = Thought.new(thought_params)
+      @thought.source = detect_source
       if @thought.save
         redirect_to admin_thoughts_path, notice: "Thought was successfully created."
       else

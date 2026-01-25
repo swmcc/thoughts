@@ -1,5 +1,7 @@
 module Api
   class ThoughtsController < BaseController
+    include SourceDetectable
+
     before_action :set_thought, only: [ :show, :update, :destroy ]
 
     # GET /api/thoughts
@@ -34,6 +36,7 @@ module Api
     # POST /api/thoughts
     def create
       @thought = Thought.new(thought_params)
+      @thought.source = detect_source
 
       if @thought.save
         render json: { thought: thought_json(@thought) }, status: :created
@@ -72,6 +75,7 @@ module Api
         id: thought.public_id,
         content: thought.content,
         tags: thought.tags,
+        source: thought.source,
         created_at: thought.created_at.iso8601
       }
 
