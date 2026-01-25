@@ -111,6 +111,55 @@ DELETE /api/thoughts/:id
 Authorization: Bearer YOUR_API_TOKEN
 ```
 
+### Command Line Interface
+
+Post thoughts directly from your terminal using the included CLI script.
+
+#### Installation
+
+```bash
+# Symlink to your PATH
+ln -s /path/to/thoughts/bin/thought /usr/local/bin/thought
+
+# Initialize configuration
+thought --init
+```
+
+#### Configuration
+
+The CLI stores config in `~/.config/thoughts/config`:
+
+```bash
+THOUGHTS_API_URL=https://your-domain.com/api/thoughts
+THOUGHTS_API_TOKEN=your-api-token
+```
+
+#### Usage
+
+```bash
+# Post a thought
+thought "Hello world"
+
+# Post with tags
+thought -t coding "Working on a new feature"
+thought -t work,meeting "Standup done"
+
+# Pipe input
+echo "Quick note" | thought -t idea
+```
+
+#### Commands
+
+| Command | Description |
+|---------|-------------|
+| `thought "content"` | Post a thought |
+| `thought -t tag "content"` | Post with tags |
+| `thought --init` | Setup configuration |
+| `thought --config` | Show current config |
+| `thought --help` | Show help |
+
+See [doc/cli.md](doc/cli.md) for full documentation.
+
 ## Testing
 
 ```bash
