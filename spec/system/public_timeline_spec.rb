@@ -55,36 +55,44 @@ RSpec.describe "Public Timeline", type: :system do
   end
 
   describe "source icon display" do
-    it "displays source icon with tooltip on timeline" do
-      thought = create(:thought, content: "Web thought", source: "web")
+    it "displays web source icon (desktop monitor) with tooltip on timeline" do
+      create(:thought, content: "Web thought", source: "web")
 
       visit root_path
 
       within(".thought-card") do
-        expect(page).to have_css("span[title='Written from web']")
-        expect(page).to have_css("span[title='Written from web'] svg")
+        # SVG title element provides the tooltip (not visible, so use visible: false)
+        expect(page).to have_css("svg title", text: "Written from web", visible: :all)
+        # Verify it's the desktop monitor icon (not the question mark fallback)
+        icon_html = find("svg")["innerHTML"]
+        expect(icon_html).to include("M2 4.25") # desktop monitor path
+        expect(icon_html).not_to include("M18 10a8 8") # question mark path
       end
     end
 
-    it "displays source icon for cli source" do
-      thought = create(:thought, content: "CLI thought", source: "cli")
+    it "displays cli source icon (terminal) with tooltip" do
+      create(:thought, content: "CLI thought", source: "cli")
 
       visit root_path
 
       within(".thought-card") do
-        expect(page).to have_css("span[title='Written from CLI']")
-        expect(page).to have_css("span[title='Written from CLI'] svg")
+        expect(page).to have_css("svg title", text: "Written from CLI", visible: :all)
+        icon_html = find("svg")["innerHTML"]
+        expect(icon_html).to include("M3.25 3") # terminal path
+        expect(icon_html).not_to include("M18 10a8 8") # question mark path
       end
     end
 
-    it "displays source icon for iphone source" do
-      thought = create(:thought, content: "iPhone thought", source: "iphone")
+    it "displays iphone source icon (phone) with tooltip" do
+      create(:thought, content: "iPhone thought", source: "iphone")
 
       visit root_path
 
       within(".thought-card") do
-        expect(page).to have_css("span[title='Written from iPhone']")
-        expect(page).to have_css("span[title='Written from iPhone'] svg")
+        expect(page).to have_css("svg title", text: "Written from iPhone", visible: :all)
+        icon_html = find("svg")["innerHTML"]
+        expect(icon_html).to include("M8 16.25") # phone path
+        expect(icon_html).not_to include("M18 10a8 8") # question mark path
       end
     end
 
@@ -93,8 +101,10 @@ RSpec.describe "Public Timeline", type: :system do
 
       visit thought_path(thought)
 
-      expect(page).to have_css("span[title='Written from web']")
-      expect(page).to have_css("span[title='Written from web'] svg")
+      expect(page).to have_css("svg title", text: "Written from web", visible: :all)
+      # Find the SVG that has the tooltip (role="img" with title)
+      icon_html = find("svg[role='img']", match: :first)["innerHTML"]
+      expect(icon_html).to include("M2 4.25") # desktop monitor path
     end
   end
 
