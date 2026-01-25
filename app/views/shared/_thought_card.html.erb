@@ -13,7 +13,7 @@
         <span class="text-[15px] font-semibold text-zinc-900 dark:text-white">swmcc</span>
         <span class="text-xs text-zinc-400 dark:text-zinc-600">·</span>
         <span title="<%= thought.source_label %>" class="text-zinc-400 dark:text-zinc-500 cursor-help">
-          <%= render "shared/source_icon", source: thought.source %>
+          <%= render partial: "shared/source_icon", locals: { source: thought.source } %>
         </span>
         <span class="text-xs text-zinc-400 dark:text-zinc-600">·</span>
         <time datetime="<%= thought.created_at.iso8601 %>" class="text-xs text-zinc-500 dark:text-zinc-500">
