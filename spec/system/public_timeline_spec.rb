@@ -61,10 +61,10 @@ RSpec.describe "Public Timeline", type: :system do
       visit root_path
 
       within(".thought-card") do
-        # SVG title element provides the tooltip (not visible, so use visible: false)
-        expect(page).to have_css("svg title", text: "Written from web", visible: :all)
+        # HTML title attribute on span provides the tooltip
+        expect(page).to have_css("span[title='Written from web']")
         # Verify it's the desktop monitor icon (not the question mark fallback)
-        icon_html = find("svg")["innerHTML"]
+        icon_html = find("span[title='Written from web'] svg")["outerHTML"]
         expect(icon_html).to include("M2 4.25") # desktop monitor path
         expect(icon_html).not_to include("M18 10a8 8") # question mark path
       end
@@ -76,8 +76,8 @@ RSpec.describe "Public Timeline", type: :system do
       visit root_path
 
       within(".thought-card") do
-        expect(page).to have_css("svg title", text: "Written from CLI", visible: :all)
-        icon_html = find("svg")["innerHTML"]
+        expect(page).to have_css("span[title='Written from CLI']")
+        icon_html = find("span[title='Written from CLI'] svg")["outerHTML"]
         expect(icon_html).to include("M3.25 3") # terminal path
         expect(icon_html).not_to include("M18 10a8 8") # question mark path
       end
@@ -89,8 +89,8 @@ RSpec.describe "Public Timeline", type: :system do
       visit root_path
 
       within(".thought-card") do
-        expect(page).to have_css("svg title", text: "Written from iPhone", visible: :all)
-        icon_html = find("svg")["innerHTML"]
+        expect(page).to have_css("span[title='Written from iPhone']")
+        icon_html = find("span[title='Written from iPhone'] svg")["outerHTML"]
         expect(icon_html).to include("M8 16.25") # phone path
         expect(icon_html).not_to include("M18 10a8 8") # question mark path
       end
@@ -101,9 +101,8 @@ RSpec.describe "Public Timeline", type: :system do
 
       visit thought_path(thought)
 
-      expect(page).to have_css("svg title", text: "Written from web", visible: :all)
-      # Find the SVG that has the tooltip (role="img" with title)
-      icon_html = find("svg[role='img']", match: :first)["innerHTML"]
+      expect(page).to have_css("span[title='Written from web']")
+      icon_html = find("span[title='Written from web'] svg")["outerHTML"]
       expect(icon_html).to include("M2 4.25") # desktop monitor path
     end
   end

@@ -40,7 +40,7 @@
           <div class="flex items-center gap-1">
             <span class="text-[17px] font-semibold text-zinc-900 dark:text-white">swmcc</span>
             <span class="text-xs text-zinc-400 dark:text-zinc-600">·</span>
-            <span class="text-zinc-400 dark:text-zinc-500 cursor-help">
+            <span title="<%= @thought.source_label %>" class="text-zinc-400 dark:text-zinc-500 cursor-help inline-flex">
               <%= render partial: "shared/source_icon", locals: { source: @thought.source } %>
             </span>
           </div>
