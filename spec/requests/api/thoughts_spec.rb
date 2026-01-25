@@ -137,6 +137,31 @@ RSpec.describe "Api::Thoughts", type: :request do
         json = JSON.parse(response.body)
         expect(json["thought"]["content"]).to eq("A new thought!")
         expect(json["thought"]["tags"]).to eq([ "test" ])
+        expect(json["thought"]["source"]).to be_present
+      end
+
+      it "detects cli source from curl user agent" do
+        headers = auth_headers.merge("User-Agent" => "curl/8.1.2")
+        post api_thoughts_path, params: valid_params, headers: headers
+
+        json = JSON.parse(response.body)
+        expect(json["thought"]["source"]).to eq("cli")
+      end
+
+      it "detects iphone source from iPhone Safari user agent" do
+        headers = auth_headers.merge("User-Agent" => "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15")
+        post api_thoughts_path, params: valid_params, headers: headers
+
+        json = JSON.parse(response.body)
+        expect(json["thought"]["source"]).to eq("iphone")
+      end
+
+      it "detects web source from Chrome user agent" do
+        headers = auth_headers.merge("User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0")
+        post api_thoughts_path, params: valid_params, headers: headers
+
+        json = JSON.parse(response.body)
+        expect(json["thought"]["source"]).to eq("web")
       end
 
       it "returns errors for invalid content" do

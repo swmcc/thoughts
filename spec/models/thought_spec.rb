@@ -80,4 +80,49 @@ RSpec.describe Thought, type: :model do
       expect(thought.reload.view_count).to eq(6)
     end
   end
+
+  describe "source" do
+    it "defaults to web" do
+      thought = create(:thought)
+      expect(thought.source).to eq("web")
+    end
+
+    it "validates source is one of the allowed values" do
+      thought = build(:thought, source: "invalid")
+      expect(thought).not_to be_valid
+      expect(thought.errors[:source]).to include("is not included in the list")
+    end
+
+    it "allows web as source" do
+      thought = build(:thought, source: "web")
+      expect(thought).to be_valid
+    end
+
+    it "allows cli as source" do
+      thought = build(:thought, source: "cli")
+      expect(thought).to be_valid
+    end
+
+    it "allows iphone as source" do
+      thought = build(:thought, source: "iphone")
+      expect(thought).to be_valid
+    end
+  end
+
+  describe "#source_label" do
+    it "returns 'Written from web' for web source" do
+      thought = build(:thought, source: "web")
+      expect(thought.source_label).to eq("Written from web")
+    end
+
+    it "returns 'Written from CLI' for cli source" do
+      thought = build(:thought, source: "cli")
+      expect(thought.source_label).to eq("Written from CLI")
+    end
+
+    it "returns 'Written from iPhone' for iphone source" do
+      thought = build(:thought, source: "iphone")
+      expect(thought.source_label).to eq("Written from iPhone")
+    end
+  end
 end
