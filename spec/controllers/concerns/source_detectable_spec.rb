@@ -67,6 +67,14 @@ RSpec.describe SourceDetectable do
       end
     end
 
+    context "with thought-cli user agent" do
+      let(:user_agent) { "thought-cli/1.0" }
+
+      it "returns cli" do
+        expect(test_class.new(user_agent).detect).to eq("cli")
+      end
+    end
+
     context "with empty user agent" do
       let(:user_agent) { "" }
 

@@ -27,6 +27,6 @@ module SourceDetectable
 
   def cli_client?(user_agent)
     user_agent.blank? ||
-      user_agent.match?(/\b(curl|httpie|wget|python-requests|ruby|insomnia|postman)\b/i)
+      user_agent.match?(/\b(curl|httpie|wget|python-requests|ruby|insomnia|postman|thought-cli)\b/i)
   end
 end
