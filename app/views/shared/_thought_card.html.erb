@@ -9,8 +9,12 @@
 
     <!-- Content -->
     <div class="flex-1 min-w-0">
-      <div class="flex items-baseline gap-1">
+      <div class="flex items-center gap-1">
         <span class="text-[15px] font-semibold text-zinc-900 dark:text-white">swmcc</span>
+        <span class="text-xs text-zinc-400 dark:text-zinc-600">·</span>
+        <span title="<%= thought.source_label %>" class="text-zinc-400 dark:text-zinc-500 cursor-help">
+          <%= render "shared/source_icon", source: thought.source %>
+        </span>
         <span class="text-xs text-zinc-400 dark:text-zinc-600">·</span>
         <time datetime="<%= thought.created_at.iso8601 %>" class="text-xs text-zinc-500 dark:text-zinc-500">
           <%= smart_time(thought.created_at) %>
