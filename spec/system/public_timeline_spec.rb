@@ -54,6 +54,50 @@ RSpec.describe "Public Timeline", type: :system do
     end
   end
 
+  describe "source icon display" do
+    it "displays source icon with tooltip on timeline" do
+      thought = create(:thought, content: "Web thought", source: "web")
+
+      visit root_path
+
+      within(".thought-card") do
+        expect(page).to have_css("span[title='Written from web']")
+        expect(page).to have_css("span[title='Written from web'] svg")
+      end
+    end
+
+    it "displays source icon for cli source" do
+      thought = create(:thought, content: "CLI thought", source: "cli")
+
+      visit root_path
+
+      within(".thought-card") do
+        expect(page).to have_css("span[title='Written from CLI']")
+        expect(page).to have_css("span[title='Written from CLI'] svg")
+      end
+    end
+
+    it "displays source icon for iphone source" do
+      thought = create(:thought, content: "iPhone thought", source: "iphone")
+
+      visit root_path
+
+      within(".thought-card") do
+        expect(page).to have_css("span[title='Written from iPhone']")
+        expect(page).to have_css("span[title='Written from iPhone'] svg")
+      end
+    end
+
+    it "displays source icon on individual thought page" do
+      thought = create(:thought, content: "Detail thought", source: "web")
+
+      visit thought_path(thought)
+
+      expect(page).to have_css("span[title='Written from web']")
+      expect(page).to have_css("span[title='Written from web'] svg")
+    end
+  end
+
   describe "viewing individual thought" do
     it "shows full thought details" do
       thought = create(:thought, content: "Full thought content", tags: [ "test" ])
