@@ -1,7 +1,10 @@
 class Thought < ApplicationRecord
   MAX_CONTENT_LENGTH = 140
 
+  SOURCES = %w[web cli iphone].freeze
+
   validates :content, presence: true, length: { maximum: MAX_CONTENT_LENGTH }
+  validates :source, inclusion: { in: SOURCES }
   validates :view_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :public_id, presence: true, uniqueness: true
 
@@ -20,6 +23,15 @@ class Thought < ApplicationRecord
 
   def increment_view_count!
     increment!(:view_count)
+  end
+
+  def source_label
+    case source
+    when "web" then "Written from web"
+    when "cli" then "Written from CLI"
+    when "iphone" then "Written from iPhone"
+    else "Written from #{source}"
+    end
   end
 
   private
