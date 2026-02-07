@@ -25,23 +25,51 @@
         <%= thought.content %>
       </p>
 
-      <% if thought.link_url.present? %>
-        <div class="mt-3 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
-          <% if thought.link_image.present? %>
-            <div class="aspect-[2/1] bg-zinc-100 dark:bg-zinc-800">
-              <%= image_tag thought.link_image, class: "w-full h-full object-cover", alt: thought.link_title %>
-            </div>
-          <% end %>
-          <div class="p-3">
-            <p class="text-xs text-zinc-500 dark:text-zinc-400 truncate"><%= URI.parse(thought.link_url).host rescue thought.link_url %></p>
-            <% if thought.link_title.present? %>
-              <p class="text-sm font-medium text-zinc-900 dark:text-white truncate"><%= thought.link_title %></p>
+      <% previews = thought.link_previews.presence || [] %>
+      <% if previews.any? %>
+        <% if previews.size == 1 %>
+          <% preview = previews.first %>
+          <div class="mt-3 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+            <% if preview["image"].present? %>
+              <div class="aspect-[2/1] bg-zinc-100 dark:bg-zinc-800">
+                <%= image_tag preview["image"], class: "w-full h-full object-cover", alt: preview["title"] %>
+              </div>
             <% end %>
-            <% if thought.link_description.present? %>
-              <p class="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-0.5"><%= thought.link_description %></p>
+            <div class="p-3">
+              <p class="text-xs text-zinc-500 dark:text-zinc-400 truncate"><%= URI.parse(preview["url"]).host rescue preview["url"] %></p>
+              <% if preview["title"].present? %>
+                <p class="text-sm font-medium text-zinc-900 dark:text-white truncate"><%= preview["title"] %></p>
+              <% end %>
+              <% if preview["description"].present? %>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-0.5"><%= preview["description"] %></p>
+              <% end %>
+            </div>
+          </div>
+        <% else %>
+          <div class="mt-3 grid grid-cols-2 gap-2">
+            <% previews.each do |preview| %>
+              <a href="<%= preview["url"] %>" target="_blank" rel="noopener" onclick="event.stopPropagation();" class="block rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                <% if preview["image"].present? %>
+                  <div class="aspect-square bg-zinc-100 dark:bg-zinc-800">
+                    <%= image_tag preview["image"], class: "w-full h-full object-cover", alt: preview["title"] %>
+                  </div>
+                <% else %>
+                  <div class="aspect-square bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                    </svg>
+                  </div>
+                <% end %>
+                <div class="p-2">
+                  <p class="text-xs text-zinc-500 dark:text-zinc-400 truncate"><%= URI.parse(preview["url"]).host rescue preview["url"] %></p>
+                  <% if preview["title"].present? %>
+                    <p class="text-xs font-medium text-zinc-900 dark:text-white truncate"><%= preview["title"] %></p>
+                  <% end %>
+                </div>
+              </a>
             <% end %>
           </div>
-        </div>
+        <% end %>
       <% end %>
 
       <% if thought.tags.any? %>

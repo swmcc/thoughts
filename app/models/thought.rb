@@ -45,36 +45,47 @@ class Thought < ApplicationRecord
   end
 
   def fetch_link_preview
-    # Extract first URL from content
-    url = content&.match(%r{https?://[^\s]+})&.to_s
-    return clear_link_preview if url.blank?
+    # Extract all URLs from content
+    urls = content&.scan(%r{https?://[^\s]+}) || []
+    return clear_link_preview if urls.empty?
 
-    begin
-      # Follow redirects to get final URL
-      final_url = follow_redirects(url)
+    previews = []
+    urls.each do |url|
+      preview = fetch_preview_for_url(url)
+      previews << preview if preview
+    end
 
-      # Check if it's a direct image link
-      if image_url?(final_url)
-        self.link_url = url
-        self.link_title = nil
-        self.link_description = nil
-        # Store the original URL, not the presigned S3 URL (which expires)
-        self.link_image = url
-      else
-        # Try to fetch OG data
-        og = OpenGraphReader.fetch(url)
-        if og&.og&.title.present? || og&.og&.image&.url.present?
-          self.link_url = url
-          self.link_title = og.og.title&.truncate(100)
-          self.link_description = og.og.description&.truncate(200)
-          self.link_image = og.og.image&.url
-        else
-          clear_link_preview
-        end
-      end
-    rescue StandardError
+    if previews.any?
+      self.link_previews = previews
+      # Keep first preview in legacy columns for backwards compatibility
+      first = previews.first
+      self.link_url = first["url"]
+      self.link_title = first["title"]
+      self.link_description = first["description"]
+      self.link_image = first["image"]
+    else
       clear_link_preview
     end
+  end
+
+  def fetch_preview_for_url(url)
+    final_url = follow_redirects(url)
+
+    if image_url?(final_url)
+      { "url" => url, "title" => nil, "description" => nil, "image" => url }
+    else
+      og = OpenGraphReader.fetch(url)
+      if og&.og&.title.present? || og&.og&.image&.url.present?
+        {
+          "url" => url,
+          "title" => og.og.title&.truncate(100),
+          "description" => og.og.description&.truncate(200),
+          "image" => og.og.image&.url
+        }
+      end
+    end
+  rescue StandardError
+    nil
   end
 
   def follow_redirects(url, limit = 5)
@@ -118,6 +129,7 @@ class Thought < ApplicationRecord
   end
 
   def clear_link_preview
+    self.link_previews = []
     self.link_url = nil
     self.link_title = nil
     self.link_description = nil
