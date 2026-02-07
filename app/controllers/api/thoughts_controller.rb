@@ -79,12 +79,22 @@ module Api
         created_at: thought.created_at.iso8601
       }
 
-      if thought.link_url.present?
+      if thought.link_previews.present?
+        json[:link_previews] = thought.link_previews.map do |preview|
+          {
+            url: preview["url"],
+            title: preview["title"],
+            description: preview["description"],
+            image: preview["image"]
+          }
+        end
+        # Keep legacy single link_preview for backwards compatibility
+        first = thought.link_previews.first
         json[:link_preview] = {
-          url: thought.link_url,
-          title: thought.link_title,
-          description: thought.link_description,
-          image: thought.link_image
+          url: first["url"],
+          title: first["title"],
+          description: first["description"],
+          image: first["image"]
         }
       end
 
