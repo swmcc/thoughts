@@ -30,13 +30,13 @@ RSpec.describe "Admin::Sessions", type: :request do
     context "with invalid credentials" do
       it "shows error and re-renders login form" do
         post admin_session_path, params: { email: admin.email, password: "wrong" }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Invalid email or password")
       end
 
       it "fails with non-existent email" do
         post admin_session_path, params: { email: "noone@example.com", password: "password123" }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Invalid email or password")
       end
     end

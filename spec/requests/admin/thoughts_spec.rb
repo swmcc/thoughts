@@ -62,7 +62,7 @@ RSpec.describe "Admin::Thoughts", type: :request do
           post admin_thoughts_path, params: { thought: { content: "" } }
         }.not_to change(Thought, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it "shows error for content too long" do
@@ -70,7 +70,7 @@ RSpec.describe "Admin::Thoughts", type: :request do
           post admin_thoughts_path, params: { thought: { content: "A" * 141 } }
         }.not_to change(Thought, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("maximum is 140 characters")
       end
     end
@@ -104,7 +104,7 @@ RSpec.describe "Admin::Thoughts", type: :request do
       it "does not update and re-renders form" do
         patch admin_thought_path(thought), params: { thought: { content: "" } }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(thought.reload.content).to eq("Original content")
       end
     end

@@ -167,7 +167,7 @@ RSpec.describe "Api::Thoughts", type: :request do
       it "returns errors for invalid content" do
         post api_thoughts_path, params: { thought: { content: "" } }, headers: auth_headers
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
         expect(json["errors"]["content"]).to include("can't be blank")
       end
@@ -175,7 +175,7 @@ RSpec.describe "Api::Thoughts", type: :request do
       it "returns errors for content too long" do
         post api_thoughts_path, params: { thought: { content: "A" * 141 } }, headers: auth_headers
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
         expect(json["errors"]["content"]).to include("is too long (maximum is 140 characters)")
       end
@@ -214,7 +214,7 @@ RSpec.describe "Api::Thoughts", type: :request do
       it "returns errors for invalid updates" do
         patch api_thought_path(thought), params: { thought: { content: "" } }, headers: auth_headers
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(thought.reload.content).to eq("Original")
       end
     end
