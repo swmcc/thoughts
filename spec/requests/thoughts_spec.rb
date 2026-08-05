@@ -52,6 +52,25 @@ RSpec.describe "Thoughts", type: :request do
       expect(response.body).to include(matching.content)
       expect(response.body).not_to include(non_matching.content)
     end
+
+    it "shows only top-level thoughts" do
+      parent = create(:thought, content: "Parent thought")
+      reply = create(:thought, content: "A threaded reply", parent: parent)
+
+      get root_path
+
+      expect(response.body).to include(parent.content)
+      expect(response.body).not_to include(reply.content)
+    end
+
+    it "shows a reply count indicator for thoughts with replies" do
+      parent = create(:thought, content: "Parent thought")
+      create_list(:thought, 2, content: "A threaded reply", parent: parent)
+
+      get root_path
+
+      expect(response.body).to include("2 replies")
+    end
   end
 
   describe "GET /thoughts/:id" do
@@ -76,6 +95,18 @@ RSpec.describe "Thoughts", type: :request do
       thought.tags.each do |tag|
         expect(response.body).to include("##{tag}")
       end
+    end
+
+    it "displays the thread of replies" do
+      parent = create(:thought, content: "Parent thought")
+      reply = create(:thought, content: "A threaded reply", parent: parent)
+      create(:thought, content: "A nested reply", parent: reply)
+
+      get thought_path(parent)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("A threaded reply")
+      expect(response.body).to include("A nested reply")
     end
   end
 end

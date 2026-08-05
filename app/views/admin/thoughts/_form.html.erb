@@ -10,6 +10,11 @@
     </div>
   <% end %>
 
+  <% if thought.parent.present? %>
+    <%= render "parent_context", parent: thought.parent %>
+    <%= f.hidden_field :parent_id %>
+  <% end %>
+
   <div data-controller="character-counter">
     <%= f.label :content, class: "block text-sm font-medium text-gray-700" %>
     <div class="mt-1">

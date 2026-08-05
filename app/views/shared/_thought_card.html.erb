@@ -79,6 +79,18 @@
           <% end %>
         </div>
       <% end %>
+
+      <% reply_count = thought.reply_count %>
+      <% if reply_count > 0 %>
+        <%# The whole card is already a link to thought_path, so this stays a span: %>
+        <%# a nested anchor would be invalid HTML and break the card layout. %>
+        <div class="mt-2 flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 20" fill="currentColor" class="pointer-events-none">
+            <path fill-rule="evenodd" d="M10 2c-4.418 0-8 2.985-8 6.667 0 2.05 1.11 3.884 2.855 5.098a.75.75 0 0 1 .317.71l-.24 1.797 1.9-1.03a.75.75 0 0 1 .53-.07c.83.19 1.71.162 2.638.162 4.418 0 8-2.985 8-6.667C18 4.985 14.418 2 10 2Z" clip-rule="evenodd" />
+          </svg>
+          <span><%= pluralize(reply_count, "reply") %></span>
+        </div>
+      <% end %>
     </div>
   <% end %>
 </article>

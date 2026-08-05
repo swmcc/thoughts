@@ -113,6 +113,18 @@
     </div>
   </article>
 
+  <% replies = @thought.replies %>
+  <% if replies.any? %>
+    <section class="mt-10">
+      <h2 class="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+        <%= pluralize(replies.size, "reply") %>
+      </h2>
+      <div class="pl-6 border-l border-zinc-200 dark:border-zinc-800">
+        <%= render partial: "thoughts/reply", collection: replies, as: :reply, locals: { depth: 0 } %>
+      </div>
+    </section>
+  <% end %>
+
   <!-- Share section -->
   <div class="mt-12 text-center">
     <p class="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-4">Share this thought</p>

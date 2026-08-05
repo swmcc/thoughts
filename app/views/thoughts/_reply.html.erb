@@ -1,0 +1,47 @@
+<%# Visual indentation is capped: once depth hits 3 the child depth stops %>
+<%# growing, so deeper replies render flush with the level-3 indent. %>
+<% child_depth = [ depth + 1, 3 ].min %>
+
+<div class="reply">
+  <article class="flex gap-3 py-3">
+    <div class="shrink-0">
+      <%= image_tag "https://swm.cc/profile.svg",
+          class: "w-8 h-8 rounded-full bg-white dark:bg-zinc-900",
+          alt: "swmcc" %>
+    </div>
+
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-1">
+        <span class="text-sm font-semibold text-zinc-900 dark:text-white">swmcc</span>
+        <span class="text-xs text-zinc-400 dark:text-zinc-600">·</span>
+        <span data-tooltip="<%= reply.source_label %>" aria-label="<%= reply.source_label %>" class="tooltip text-zinc-400 dark:text-zinc-500 cursor-help inline-flex">
+          <%= render partial: "shared/source_icon", locals: { source: reply.source } %>
+        </span>
+        <span class="text-xs text-zinc-400 dark:text-zinc-600">·</span>
+        <%= link_to thought_path(reply), class: "text-xs text-zinc-500 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors" do %>
+          <time datetime="<%= reply.created_at.iso8601 %>">
+            <%= full_timestamp(reply.created_at) %>
+          </time>
+        <% end %>
+      </div>
+
+      <p class="mt-1 text-[15px] text-zinc-800 dark:text-zinc-200 leading-relaxed">
+        <%= reply.content %>
+      </p>
+
+      <% if reply.tags.any? %>
+        <div class="mt-2 text-sm">
+          <% reply.tags.each_with_index do |tag, i| %>
+            <%= link_to "##{tag}", root_path(tag: tag), class: "text-blue-500 dark:text-blue-400 hover:underline" %><% if i < reply.tags.length - 1 %> <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </article>
+
+  <% if reply.replies.any? %>
+    <div class="<%= "pl-6 border-l border-zinc-200 dark:border-zinc-800" if child_depth > depth %>">
+      <%= render partial: "thoughts/reply", collection: reply.replies, as: :reply, locals: { depth: child_depth } %>
+    </div>
+  <% end %>
+</div>

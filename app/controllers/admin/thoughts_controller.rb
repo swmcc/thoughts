@@ -12,7 +12,12 @@ module Admin
     end
 
     def new
-      @thought = Thought.new
+      if params[:parent_id].present?
+        @parent = Thought.find_by(public_id: params[:parent_id])
+        @thought = Thought.new(parent: @parent)
+      else
+        @thought = Thought.new
+      end
     end
 
     def create
@@ -48,7 +53,7 @@ module Admin
     end
 
     def thought_params
-      params.require(:thought).permit(:content, :created_at, tags: [])
+      params.require(:thought).permit(:content, :created_at, :parent_id, tags: [])
     end
   end
 end
