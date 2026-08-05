@@ -2,10 +2,17 @@
   <div class="mb-6 flex justify-between items-center">
     <h1 class="text-2xl font-bold text-gray-900">Thought Details</h1>
     <div class="space-x-2">
+      <%= link_to "Reply", new_admin_thought_path(parent_id: @thought.public_id), class: "px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50" %>
       <%= link_to "Edit", edit_admin_thought_path(@thought), class: "px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50" %>
       <%= link_to "Back", admin_thoughts_path, class: "px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700" %>
     </div>
   </div>
+
+  <% if @thought.parent.present? %>
+    <div class="mb-4">
+      <%= render "parent_context", parent: @thought.parent %>
+    </div>
+  <% end %>
 
   <div class="bg-white shadow rounded-lg overflow-hidden">
     <div class="p-6">

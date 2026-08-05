@@ -43,6 +43,17 @@ RSpec.describe "Admin::Thoughts", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("New Thought")
     end
+
+    it "renders the parent context when parent_id is present" do
+      parent = create(:thought, content: "The original thought")
+
+      get new_admin_thought_path(parent_id: parent.public_id)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Replying to:")
+      expect(response.body).to include("The original thought")
+      expect(response.body).to include(%(name="thought[parent_id]"))
+    end
   end
 
   describe "POST /admin/thoughts" do
@@ -53,6 +64,17 @@ RSpec.describe "Admin::Thoughts", type: :request do
         }.to change(Thought, :count).by(1)
 
         expect(response).to redirect_to(admin_thoughts_path)
+      end
+
+      it "creates a reply when parent_id is present" do
+        parent = create(:thought, content: "The original thought")
+
+        expect {
+          post admin_thoughts_path, params: { thought: { content: "A considered reply", parent_id: parent.id } }
+        }.to change(Thought, :count).by(1)
+
+        expect(response).to redirect_to(admin_thoughts_path)
+        expect(Thought.last.parent).to eq(parent)
       end
     end
 

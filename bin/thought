@@ -34,17 +34,21 @@ Usage: thought [OPTIONS] [CONTENT]
 Post a thought from the command line.
 
 Options:
-  -t, --tag TAG    Add a tag (can be used multiple times)
-  -h, --help       Show this help message
-  -v, --version    Show version
-  --init           Initialize configuration
-  --config         Show current configuration
+  -t, --tag TAG      Add a tag (can be used multiple times)
+  -r, --reply ID     Reply to a thought (use parent's public_id)
+  -h, --help         Show this help message
+  -v, --version      Show version
+  --init             Initialize configuration
+  --config           Show current configuration
 
 Examples:
   thought "Hello world"
   thought -t coding -t ruby "Learning Ruby today"
   thought --tag=work "Finished the feature"
+  thought -r abc123XYZ456 "Replying to that"
+  thought --reply=abc123XYZ456 -t coding "Tagged reply"
   echo "Piped thought" | thought
+  echo "Piped reply" | thought -r abc123XYZ456
   echo "With tags" | thought -t idea
 
 Configuration:
@@ -154,12 +158,20 @@ post_thought() {
         tags_json=$(printf '%s\n' "${tags[@]}" | jq -R . | jq -s .)
     fi
 
-    # Build request body
+    # Build request body (conditionally include parent_id)
     local body
-    body=$(jq -n \
-        --arg content "$content" \
-        --argjson tags "$tags_json" \
-        '{thought: {content: $content, tags: $tags}}')
+    if [[ -n "${PARENT_ID}" ]]; then
+        body=$(jq -n \
+            --arg content "$content" \
+            --argjson tags "$tags_json" \
+            --arg parent_id "$PARENT_ID" \
+            '{thought: {content: $content, tags: $tags, parent_id: $parent_id}}')
+    else
+        body=$(jq -n \
+            --arg content "$content" \
+            --argjson tags "$tags_json" \
+            '{thought: {content: $content, tags: $tags}}')
+    fi
 
     # Make API request
     local response
@@ -178,8 +190,15 @@ post_thought() {
     if [[ "$http_code" == "201" ]]; then
         local id
         id=$(echo "$response" | jq -r '.thought.id')
+        local parent_id
+        parent_id=$(echo "$response" | jq -r '.thought.parent_id // empty')
+
         echo -e "${GREEN}Thought posted successfully.${NC}"
         echo -e "ID: ${BLUE}${id}${NC}"
+
+        if [[ -n "${parent_id}" ]]; then
+            echo -e "In reply to: ${BLUE}${parent_id}${NC}"
+        fi
 
         if [[ ${#tags[@]} -gt 0 ]]; then
             echo -e "Tags: ${YELLOW}${tags[*]}${NC}"
@@ -194,6 +213,7 @@ post_thought() {
 # Parse arguments
 TAGS=()
 CONTENT=""
+PARENT_ID=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -227,6 +247,19 @@ while [[ $# -gt 0 ]]; do
         --tag=*)
             IFS=',' read -ra SPLIT_TAGS <<< "${1#*=}"
             TAGS+=("${SPLIT_TAGS[@]}")
+            shift
+            ;;
+        -r|--reply)
+            if [[ -n "$2" && ! "$2" =~ ^- ]]; then
+                PARENT_ID="$2"
+                shift 2
+            else
+                echo -e "${RED}Error: --reply requires an argument.${NC}" >&2
+                exit 1
+            fi
+            ;;
+        --reply=*)
+            PARENT_ID="${1#*=}"
             shift
             ;;
         -*)

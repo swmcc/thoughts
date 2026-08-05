@@ -3,10 +3,15 @@ class Thought < ApplicationRecord
 
   SOURCES = %w[web cli iphone].freeze
 
+  belongs_to :parent, class_name: "Thought", optional: true
+  has_many :replies, -> { order(created_at: :asc) },
+           class_name: "Thought", foreign_key: :parent_id, inverse_of: :parent, dependent: :destroy
+
   validates :content, presence: true, length: { maximum: MAX_CONTENT_LENGTH }
   validates :source, inclusion: { in: SOURCES }
   validates :view_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :public_id, presence: true, uniqueness: true
+  validate :no_circular_parentage
 
   before_validation :generate_public_id, on: :create
   before_save :normalize_tags
@@ -20,6 +25,25 @@ class Thought < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :with_tag, ->(tag) { where("? = ANY(tags)", tag) }
   scope :search, ->(query) { where("content ILIKE ?", "%#{query}%") }
+  scope :top_level, -> { where(parent_id: nil) }
+
+  def reply_count
+    replies.count
+  end
+
+  # Walk up the parent chain to the topmost ancestor
+  def thread_root
+    node = self
+    seen = [ id ].compact
+    while node.parent_id.present?
+      parent = node.parent
+      break if parent.nil? || seen.include?(parent.id)
+
+      seen << parent.id
+      node = parent
+    end
+    node
+  end
 
   def increment_view_count!
     increment!(:view_count)
@@ -35,6 +59,27 @@ class Thought < ApplicationRecord
   end
 
   private
+
+  def no_circular_parentage
+    return if parent_id.blank?
+
+    if parent_id == id
+      errors.add(:parent_id, "can't be itself")
+      return
+    end
+
+    ancestor = parent
+    seen = []
+    while ancestor
+      if ancestor.id == id || seen.include?(ancestor.id)
+        errors.add(:parent_id, "can't create a circular thread")
+        return
+      end
+
+      seen << ancestor.id
+      ancestor = ancestor.parent
+    end
+  end
 
   def generate_public_id
     self.public_id ||= SecureRandom.alphanumeric(12)
