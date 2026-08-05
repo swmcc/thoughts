@@ -8,6 +8,11 @@ RSpec.describe "Admin Thoughts Management", type: :system do
     fill_in "Email", with: admin.email
     fill_in "Password", with: "password123"
     click_button "Sign in"
+
+    # Turbo submits the form asynchronously, so click_button returns before the
+    # session cookie is set. Wait for the redirect to land, otherwise the
+    # visit in each example races it and arrives unauthenticated.
+    expect(page).to have_current_path(admin_root_path)
   end
 
   describe "viewing thoughts" do
