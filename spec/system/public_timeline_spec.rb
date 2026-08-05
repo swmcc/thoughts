@@ -127,4 +127,51 @@ RSpec.describe "Public Timeline", type: :system do
       expect(thought.reload.view_count).to eq(6)
     end
   end
+
+  describe "threaded replies" do
+    it "shows a reply count indicator instead of the replies themselves" do
+      parent = create(:thought, content: "Parent thought")
+      create(:thought, content: "First reply", parent: parent)
+      create(:thought, content: "Second reply", parent: parent)
+
+      visit root_path
+
+      expect(page).to have_content("Parent thought")
+      expect(page).to have_content("2 replies")
+      expect(page).not_to have_content("First reply")
+    end
+
+    it "pluralises a single reply" do
+      parent = create(:thought, content: "Parent thought")
+      create(:thought, content: "Only reply", parent: parent)
+
+      visit root_path
+
+      expect(page).to have_content("1 reply")
+    end
+
+    it "renders nested replies under the parent on the show page" do
+      parent = create(:thought, content: "Parent thought")
+      reply = create(:thought, content: "First reply", parent: parent)
+      create(:thought, content: "Nested reply", parent: reply)
+
+      visit thought_path(parent)
+
+      expect(page).to have_content("Parent thought")
+      expect(page).to have_content("First reply")
+      expect(page).to have_content("Nested reply")
+
+      # The nested reply renders inside its parent reply, not alongside it.
+      expect(page).to have_css(".reply .reply")
+    end
+
+    it "links a reply to its own page" do
+      parent = create(:thought, content: "Parent thought")
+      reply = create(:thought, content: "First reply", parent: parent)
+
+      visit thought_path(parent)
+
+      expect(page).to have_link(href: thought_path(reply))
+    end
+  end
 end

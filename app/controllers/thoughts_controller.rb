@@ -1,6 +1,6 @@
 class ThoughtsController < ApplicationController
   def index
-    @thoughts = Thought.recent.page(params[:page]).per(25)
+    @thoughts = Thought.top_level.recent.page(params[:page]).per(25)
 
     if params[:tag].present?
       @thoughts = @thoughts.with_tag(params[:tag])

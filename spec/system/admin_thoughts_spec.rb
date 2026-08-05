@@ -48,6 +48,24 @@ RSpec.describe "Admin Thoughts Management", type: :system do
     end
   end
 
+  describe "replying to a thought" do
+    let!(:parent) { create(:thought, content: "The original thought") }
+
+    it "creates a reply from the index page" do
+      visit admin_thoughts_path
+      click_link "Reply"
+
+      expect(page).to have_content("Replying to:")
+      expect(page).to have_content("The original thought")
+
+      fill_in "Content", with: "A considered reply"
+      click_button "Create Thought"
+
+      expect(page).to have_content("Thought was successfully created")
+      expect(Thought.find_by(content: "A considered reply").parent).to eq(parent)
+    end
+  end
+
   describe "editing a thought" do
     let!(:thought) { create(:thought, content: "Original content") }
 
