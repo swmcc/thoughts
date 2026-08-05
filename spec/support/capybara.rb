@@ -26,5 +26,12 @@ Capybara.javascript_driver = CAPYBARA_DRIVER
 RSpec.configure do |config|
   config.before(:each, type: :system) do
     driven_by CAPYBARA_DRIVER
+    # Deterministic desktop viewport. Headless Chrome defaults to ~756px wide,
+    # which is below Tailwind's `lg` breakpoint (1024px) — the timeline sidebar
+    # (and its tag links) are hidden there, so specs click different elements
+    # depending on window size. Pin it above the breakpoint.
+    if CAPYBARA_DRIVER.to_s.include?("chrome")
+      page.driver.browser.manage.window.resize_to(1400, 1000)
+    end
   end
 end
