@@ -9,7 +9,9 @@ Rails.application.routes.draw do
 
   # JSON API (read = public, write = token auth)
   namespace :api do
-    resources :thoughts, only: [ :index, :show, :create, :update, :destroy ]
+    resources :thoughts, only: [ :index, :show, :create, :update, :destroy ] do
+      member { get :thread }
+    end
     get "tags", to: "tags#index"
   end
 
