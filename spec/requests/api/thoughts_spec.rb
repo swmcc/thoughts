@@ -243,6 +243,108 @@ RSpec.describe "Api::Thoughts", type: :request do
     end
   end
 
+  describe "threaded replies" do
+    describe "GET /api/thoughts" do
+      it "excludes replies and reports the reply count" do
+        parent = create(:thought, content: "Parent thought")
+        create(:thought, content: "Reply thought", parent: parent)
+
+        get api_thoughts_path
+
+        json = JSON.parse(response.body)
+        expect(json["thoughts"].length).to eq(1)
+        expect(json["thoughts"].first["id"]).to eq(parent.public_id)
+        expect(json["thoughts"].first["reply_count"]).to eq(1)
+        expect(json["thoughts"].first["parent_id"]).to be_nil
+        expect(json["thoughts"].first).not_to have_key("replies")
+      end
+    end
+
+    describe "GET /api/thoughts/:id" do
+      it "includes nested replies and the reply count" do
+        parent = create(:thought, content: "Parent thought")
+        reply = create(:thought, content: "Reply thought", parent: parent)
+        create(:thought, content: "Nested reply", parent: reply)
+
+        get api_thought_path(parent)
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)["thought"]
+        expect(json["reply_count"]).to eq(1)
+        expect(json["replies"].length).to eq(1)
+        expect(json["replies"].first["id"]).to eq(reply.public_id)
+        expect(json["replies"].first["parent_id"]).to eq(parent.public_id)
+        expect(json["replies"].first["replies"].first["content"]).to eq("Nested reply")
+      end
+    end
+
+    describe "GET /api/thoughts/:id/thread" do
+      it "returns the root with fully nested replies from a leaf reply" do
+        root = create(:thought, content: "Root thought")
+        reply = create(:thought, content: "Reply thought", parent: root)
+        leaf = create(:thought, content: "Leaf reply", parent: reply)
+
+        get thread_api_thought_path(leaf)
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)["thought"]
+        expect(json["id"]).to eq(root.public_id)
+        expect(json["replies"].first["id"]).to eq(reply.public_id)
+        expect(json["replies"].first["replies"].first["id"]).to eq(leaf.public_id)
+      end
+
+      it "does not increment view counts" do
+        root = create(:thought, content: "Root thought", view_count: 0)
+
+        expect {
+          get thread_api_thought_path(root)
+        }.not_to change { root.reload.view_count }
+      end
+
+      it "returns 404 for a non-existent thought" do
+        get thread_api_thought_path(id: "nonexistent123")
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    describe "POST /api/thoughts" do
+      let(:parent) { create(:thought, content: "Parent thought") }
+
+      it "creates a reply for a valid parent public_id" do
+        params = { thought: { content: "A reply", parent_id: parent.public_id } }
+
+        expect {
+          post api_thoughts_path, params: params, headers: auth_headers
+        }.to change(Thought, :count).by(1)
+
+        expect(response).to have_http_status(:created)
+        json = JSON.parse(response.body)["thought"]
+        expect(json["parent_id"]).to eq(parent.public_id)
+        expect(Thought.find_by(public_id: json["id"]).parent).to eq(parent)
+      end
+
+      it "returns 422 when the parent does not exist" do
+        params = { thought: { content: "A reply", parent_id: "nonexistent123" } }
+
+        expect {
+          post api_thoughts_path, params: params, headers: auth_headers
+        }.not_to change(Thought, :count)
+
+        expect(response).to have_http_status(:unprocessable_content)
+        json = JSON.parse(response.body)
+        expect(json["errors"]["parent_id"]).to include("does not exist")
+      end
+
+      it "requires authentication" do
+        params = { thought: { content: "A reply", parent_id: parent.public_id } }
+
+        post api_thoughts_path, params: params
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
   describe "GET /api/tags" do
     it "returns all unique tags" do
       create(:thought, tags: [ "rails", "ruby" ])
