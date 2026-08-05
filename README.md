@@ -76,12 +76,15 @@ Visit `http://localhost:3000/admin` to access the admin interface.
 #### Public Endpoints (no auth required)
 
 ```bash
-# List all thoughts
+# List all top-level thoughts (excludes replies)
 GET /api/thoughts
 GET /api/thoughts?tag=rails&page=1&per_page=20
 
-# Get single thought
+# Get single thought with replies
 GET /api/thoughts/:id
+
+# Get complete thread (root thought with all nested replies)
+GET /api/thoughts/:id/thread
 
 # Get all tags
 GET /api/tags
@@ -90,7 +93,7 @@ GET /api/tags
 #### Authenticated Endpoints (Bearer token required)
 
 ```bash
-# Create thought
+# Create thought (optionally as a reply)
 POST /api/thoughts
 Authorization: Bearer YOUR_API_TOKEN
 Content-Type: application/json
@@ -98,7 +101,29 @@ Content-Type: application/json
 {
   "thought": {
     "content": "Hello world!",
-    "tags": ["greeting"]
+    "tags": ["greeting"],
+    "parent_id": "abc123XYZ456"  # Optional: public_id of parent thought
+  }
+}
+
+# Response (201 Created)
+{
+  "thought": {
+    "id": "xyz789ABC123",
+    "content": "Hello world!",
+    "tags": ["greeting"],
+    "source": "web",
+    "created_at": "2024-01-15T10:30:00Z",
+    "parent_id": null,              # null if top-level, parent's public_id if reply
+    "reply_count": 0,
+    "replies": []                   # Only populated on GET /api/thoughts/:id
+  }
+}
+
+# Error: unknown parent (422 Unprocessable Content)
+{
+  "errors": {
+    "parent_id": ["does not exist"]
   }
 }
 
@@ -110,6 +135,17 @@ Authorization: Bearer YOUR_API_TOKEN
 DELETE /api/thoughts/:id
 Authorization: Bearer YOUR_API_TOKEN
 ```
+
+#### Response Fields
+
+- `id`: Public ID of the thought (used in URLs)
+- `content`: 140-character thought text
+- `tags`: Array of tags
+- `source`: Origin of post (`web`, `cli`, or `iphone`)
+- `created_at`: ISO 8601 timestamp
+- `parent_id`: Public ID of parent thought (null for top-level thoughts)
+- `reply_count`: Number of direct replies
+- `replies`: Nested array of reply thoughts (only included on `GET /api/thoughts/:id` and `GET /api/thoughts/:id/thread`, oldest first)
 
 ### Command Line Interface
 
@@ -144,8 +180,13 @@ thought "Hello world"
 thought -t coding "Working on a new feature"
 thought -t work,meeting "Standup done"
 
+# Reply to a thought (use parent's public_id)
+thought -r abc123XYZ456 "Replying to that"
+thought --reply=abc123XYZ456 -t coding "Tagged reply"
+
 # Pipe input
 echo "Quick note" | thought -t idea
+echo "Piped reply" | thought -r abc123XYZ456
 ```
 
 #### Commands
@@ -154,9 +195,25 @@ echo "Quick note" | thought -t idea
 |---------|-------------|
 | `thought "content"` | Post a thought |
 | `thought -t tag "content"` | Post with tags |
+| `thought -r id "content"` | Post as reply to a thought |
 | `thought --init` | Setup configuration |
 | `thought --config` | Show current config |
 | `thought --help` | Show help |
+
+#### Threaded Replies
+
+Use the `-r` or `--reply` flag to respond to an existing thought:
+
+```bash
+# Reply to a thought
+thought -r abc123XYZ456 "Great point!"
+
+# Chain replies using the returned ID
+thought -r abc123XYZ456 "First reply"
+thought -r xyz789ABC123 "Reply to the reply"
+```
+
+The CLI will display the parent's public_id when posting a reply, allowing you to chain further replies from the terminal.
 
 See [doc/cli.md](doc/cli.md) for full documentation.
 
