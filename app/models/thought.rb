@@ -120,17 +120,35 @@ class Thought < ApplicationRecord
       { "url" => url, "title" => nil, "description" => nil, "image" => url }
     else
       og = OpenGraphReader.fetch(url)
-      if og&.og&.title.present? || og&.og&.image&.url.present?
+      return nil unless og
+
+      title = og.og.title
+      image = og.og.image&.url
+      # og:images rot (or lie) — only store one that actually serves an image
+      image = nil unless fetchable_image?(image)
+      if title.present? || image.present?
         {
           "url" => url,
-          "title" => og.og.title&.truncate(100),
+          "title" => title&.truncate(100),
           "description" => og.og.description&.truncate(200),
-          "image" => og.og.image&.url
+          "image" => image
         }
       end
     end
   rescue StandardError
     nil
+  end
+
+  def fetchable_image?(url)
+    return false if url.blank?
+
+    uri = URI.parse(follow_redirects(url))
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https", open_timeout: 5, read_timeout: 5) do |http|
+      http.head(uri.request_uri)
+    end
+    response.is_a?(Net::HTTPSuccess) && response["content-type"].to_s.start_with?("image/")
+  rescue StandardError
+    false
   end
 
   def follow_redirects(url, limit = 5)

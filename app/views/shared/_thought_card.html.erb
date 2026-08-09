@@ -29,10 +29,10 @@
       <% if previews.any? %>
         <% if previews.size == 1 %>
           <% preview = previews.first %>
-          <div class="mt-3 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+          <div class="mt-3 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors" data-controller="link-preview">
             <% if preview["image"].present? %>
-              <div class="aspect-[2/1] bg-zinc-100 dark:bg-zinc-800">
-                <%= image_tag preview["image"], class: "w-full h-full object-cover", alt: preview["title"] %>
+              <div class="aspect-[2/1] bg-zinc-100 dark:bg-zinc-800" data-link-preview-image-box>
+                <%= image_tag preview["image"], class: "w-full h-full object-cover", alt: preview["title"], data: { link_preview_target: "image" } %>
               </div>
             <% end %>
             <div class="p-3">
@@ -48,10 +48,10 @@
         <% else %>
           <div class="mt-3 grid grid-cols-2 gap-2">
             <% previews.each do |preview| %>
-              <a href="<%= preview["url"] %>" target="_blank" rel="noopener" onclick="event.stopPropagation();" class="block rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+              <a href="<%= preview["url"] %>" target="_blank" rel="noopener" onclick="event.stopPropagation();" class="block rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors" data-controller="link-preview">
                 <% if preview["image"].present? %>
-                  <div class="aspect-square bg-zinc-100 dark:bg-zinc-800">
-                    <%= image_tag preview["image"], class: "w-full h-full object-cover", alt: preview["title"] %>
+                  <div class="aspect-square bg-zinc-100 dark:bg-zinc-800" data-link-preview-image-box>
+                    <%= image_tag preview["image"], class: "w-full h-full object-cover", alt: preview["title"], data: { link_preview_target: "image" } %>
                   </div>
                 <% else %>
                   <div class="aspect-square bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
