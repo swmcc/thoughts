@@ -10,7 +10,7 @@ gem "pg", "~> 1.1"
 gem "propshaft"
 gem "puma", ">= 5.0"
 gem "rack-cors"
-gem "rails", "~> 8.1.1"
+gem "rails", "~> 8.1.4"
 gem "stimulus-rails"
 gem "tailwindcss-rails"
 gem "thruster", require: false
