@@ -6,7 +6,7 @@ gem "importmap-rails"
 gem "kamal", require: false
 gem "kaminari"
 gem "open_graph_reader"
-gem "pg", "~> 1.1"
+gem "pg", "~> 1.7"
 gem "propshaft"
 gem "puma", ">= 5.0"
 gem "rack-cors"
