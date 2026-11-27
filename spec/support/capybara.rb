@@ -35,3 +35,29 @@ RSpec.configure do |config|
     end
   end
 end
+
+# Chrome 158 rejects the wildcard origin Capybara 3.40 passes to
+# Storage.clearDataForOrigin in ChromeDriver#reset!, so every system spec
+# errors during teardown ("* is not a valid URL"). Do the same cleanup by
+# hand: wipe the page's web storage while still on the app's origin, then
+# cookies for all origins. Drop this once Capybara ships a fix.
+module ChromeWildcardStorageResetFix
+  def reset!
+    clear_app_web_storage
+    super
+  rescue Selenium::WebDriver::Error::InvalidArgumentError => e
+    raise unless e.message.include?("is not a valid URL")
+
+    execute_cdp("Network.clearBrowserCookies")
+  end
+
+  private
+
+  def clear_app_web_storage
+    execute_script("localStorage.clear(); sessionStorage.clear();") if current_url.to_s.start_with?("http")
+  rescue Selenium::WebDriver::Error::WebDriverError
+    # No page or an open alert: super handles both.
+  end
+end
+
+Capybara::Selenium::Driver::ChromeDriver.prepend(ChromeWildcardStorageResetFix)
