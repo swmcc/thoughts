@@ -11,7 +11,9 @@
         Everything it posts is labelled as written by an agent. It can't edit or delete anything.
       </p>
 
-      <%= form_with url: oauth_authorize_path, method: :post, class: "flex gap-3" do |f| %>
+      <%# Turbo submits via fetch, which can't follow the redirect to the client's
+          other-origin callback (e.g. claude.ai), so the click silently does nothing. %>
+      <%= form_with url: oauth_authorize_path, method: :post, data: { turbo: false }, class: "flex gap-3" do |f| %>
         <% %w[client_id redirect_uri response_type state code_challenge code_challenge_method].each do |name| %>
           <%= hidden_field_tag name, params[name] %>
         <% end %>
