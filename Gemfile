@@ -5,6 +5,7 @@ gem "bootsnap", require: false
 gem "importmap-rails"
 gem "kamal", require: false
 gem "kaminari"
+gem "mcp", "~> 1.11"
 gem "open_graph_reader"
 gem "pg", "~> 1.7"
 gem "propshaft"
