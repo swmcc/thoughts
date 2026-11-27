@@ -1,0 +1,25 @@
+<div class="min-h-screen flex items-center justify-center -mt-16">
+  <div class="max-w-md w-full">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Connect <%= @client.client_name %>?</h1>
+      <p class="mt-2 text-gray-600">Signed in as <%= current_admin.email %></p>
+    </div>
+
+    <div class="bg-white shadow-lg rounded-lg p-8 space-y-6">
+      <p class="text-sm text-gray-700">
+        <strong><%= @client.client_name %></strong> will be able to read your thoughts and post new thoughts and replies.
+        Everything it posts is labelled as written by an agent. It can't edit or delete anything.
+      </p>
+
+      <%= form_with url: oauth_authorize_path, method: :post, class: "flex gap-3" do |f| %>
+        <% %w[client_id redirect_uri response_type state code_challenge code_challenge_method].each do |name| %>
+          <%= hidden_field_tag name, params[name] %>
+        <% end %>
+        <%= button_tag "Deny", name: "decision", value: "deny",
+            class: "flex-1 py-2 px-4 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer" %>
+        <%= button_tag "Allow", name: "decision", value: "approve",
+            class: "flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 cursor-pointer" %>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -9,8 +9,10 @@ module Admin
     def create
       admin = AdminUser.find_by(email: params[:email])
       if admin&.authenticate(params[:password])
+        return_to = session.delete(:return_to_after_login)
+        reset_session
         session[:admin_user_id] = admin.id
-        redirect_to admin_root_path, notice: "Welcome back!"
+        redirect_to safe_return_path(return_to) || admin_root_path, notice: "Welcome back!"
       else
         flash.now[:alert] = "Invalid email or password"
         render :new, status: :unprocessable_entity
@@ -28,6 +30,11 @@ module Admin
     end
 
     private
+
+    # Only same-site paths (set by Oauth::AuthorizationsController), never "//host".
+    def safe_return_path(path)
+      path if path.is_a?(String) && path.start_with?("/") && !path.start_with?("//")
+    end
 
     def current_admin
       @current_admin ||= AdminUser.find_by(id: session[:admin_user_id]) if session[:admin_user_id]

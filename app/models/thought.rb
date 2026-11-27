@@ -1,7 +1,7 @@
 class Thought < ApplicationRecord
   MAX_CONTENT_LENGTH = 140
 
-  SOURCES = %w[web cli iphone].freeze
+  SOURCES = %w[web cli iphone agent].freeze
 
   belongs_to :parent, class_name: "Thought", optional: true
   has_many :replies, -> { order(created_at: :asc) },
@@ -54,6 +54,7 @@ class Thought < ApplicationRecord
     when "web" then "Written from web"
     when "cli" then "Written from CLI"
     when "iphone" then "Written from iPhone"
+    when "agent" then agent_client.present? ? "Written by an agent (#{agent_client})" : "Written by an agent"
     else "Written from #{source}"
     end
   end
